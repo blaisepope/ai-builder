@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Builder Dashboard — Blaise Pope</title>
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --surface: #F5F5F7;
+    --surface2: #F4F8FB;
+    --border: #D2D2D7;
+    --border-light: #E8E8ED;
+    --accent: #0071E3;
+    --accent-hover: #0077ED;
+    --accent-soft: rgba(0,113,227,0.08);
+    --accent2: #5E5CE6;
+    --accent2-soft: rgba(94,92,230,0.08);
+    --green: #34C759;
+    --green-soft: rgba(52,199,89,0.10);
+    --yellow: #FF9F0A;
+    --yellow-soft: rgba(255,159,10,0.10);
+    --red: #FF3B30;
+    --red-soft: rgba(255,59,48,0.10);
+    --text: #1D1D1F;
+    --text2: #333336;
+    --muted: #6E6E73;
+    --label: #3C3C43;
+    --grad-hero: linear-gradient(135deg, #EEF4FF 0%, #F0EEFF 40%, #FFF0FB 100%);
+    --grad-blue-purple: linear-gradient(135deg, #0071E3, #5E5CE6);
+    --grad-blue-teal: linear-gradient(135deg, #0071E3, #32ADE6);
+    --grad-green-teal: linear-gradient(135deg, #34C759, #32ADE6);
+    --grad-footer: linear-gradient(135deg, #F0EEFF 0%, #EEF4FF 100%);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  /* ── Nav ── */
+  .nav {
+    background: rgba(255,255,255,0.82);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+    height: 48px;
+    padding: 0 24px;
+  }
+  .nav a {
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: -0.12px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  .nav a:hover { color: var(--text); }
+  .nav a.active { color: var(--text); font-weight: 500; }
+
+  /* ── Hero ── */
+  .hero {
+    text-align: center;
+    padding: 48px 24px 40px;
+    border-bottom: 1px solid var(--border-light);
+    background: var(--grad-hero);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 400px;
+    background: radial-gradient(ellipse at center, rgba(0,113,227,0.07) 0%, rgba(94,92,230,0.05) 40%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, rgba(94,92,230,0.12), rgba(191,90,242,0.12));
+    color: var(--accent2);
+    padding: 4px 14px;
+    border-radius: 980px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(94,92,230,0.22);
+  }
+  .hero h1 {
+    font-size: 34px;
+    font-weight: 600;
+    letter-spacing: -0.374px;
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .hero-sub {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: -0.12px;
+  }
+
+  /* ── Board layout ── */
+  .board-wrap {
+    padding: 32px 24px 48px;
+    overflow-x: auto;
+  }
+  .board {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(280px, 1fr));
+    gap: 16px;
+    min-width: 1120px;
+  }
+
+  /* ── Column ── */
+  .column {
+    border-radius: 18px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 520px;
+  }
+  .col-suggested { background: var(--surface); border: 1px solid var(--border-light); }
+  .col-to-build  { background: rgba(0,113,227,0.05); border: 1px solid rgba(0,113,227,0.14); }
+  .col-in-progress { background: rgba(255,159,10,0.06); border: 1px solid rgba(255,159,10,0.18); }
+  .col-done      { background: rgba(52,199,89,0.07); border: 1px solid rgba(52,199,89,0.22); }
+
+  .col-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 18px 14px;
+    border-bottom: 1px solid transparent;
+  }
+  .col-suggested .col-header  { border-color: var(--border-light); }
+  .col-to-build .col-header   { border-color: rgba(0,113,227,0.12); }
+  .col-in-progress .col-header { border-color: rgba(255,159,10,0.16); }
+  .col-done .col-header       { border-color: rgba(52,199,89,0.18); }
+
+  .col-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .col-suggested .col-title  { color: var(--muted); }
+  .col-to-build .col-title   { color: #005BBB; }
+  .col-in-progress .col-title { color: #B36200; }
+  .col-done .col-title       { color: #1E8A3C; }
+
+  .col-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .col-suggested .col-dot  { background: var(--muted); }
+  .col-to-build .col-dot   { background: var(--accent); }
+  .col-in-progress .col-dot { background: var(--yellow); }
+  .col-done .col-dot       { background: var(--green); }
+
+  .col-count {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 980px;
+    min-width: 22px;
+    text-align: center;
+  }
+  .col-suggested .col-count  { background: rgba(110,110,115,0.12); color: var(--muted); }
+  .col-to-build .col-count   { background: rgba(0,113,227,0.12); color: #005BBB; }
+  .col-in-progress .col-count { background: rgba(255,159,10,0.14); color: #B36200; }
+  .col-done .col-count       { background: rgba(52,199,89,0.14); color: #1E8A3C; }
+
+  /* ── Drop zone ── */
+  .drop-zone {
+    flex: 1;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 80px;
+    transition: background 0.15s ease;
+    border-radius: 0 0 18px 18px;
+  }
+  .drop-zone.drag-over {
+    background: rgba(0,113,227,0.05);
+    outline: 2px dashed rgba(0,113,227,0.25);
+    outline-offset: -4px;
+    border-radius: 0 0 16px 16px;
+  }
+  .col-done .drop-zone.drag-over {
+    background: rgba(52,199,89,0.06);
+    outline-color: rgba(52,199,89,0.30);
+  }
+  .col-in-progress .drop-zone.drag-over {
+    background: rgba(255,159,10,0.06);
+    outline-color: rgba(255,159,10,0.30);
+  }
+
+  /* empty state */
+  .drop-zone:empty::after,
+  .drop-zone.is-empty::after {
+    content: attr(data-empty);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 64px;
+    font-size: 12px;
+    color: var(--muted);
+    opacity: 0.5;
+    letter-spacing: -0.12px;
+    text-align: center;
+    border-radius: 12px;
+    border: 1.5px dashed var(--border);
+    margin: 4px 0;
+  }
+
+  /* ── Kanban card ── */
+  .k-card {
+    background: #FFFFFF;
+    border-radius: 14px;
+    padding: 16px 16px 14px;
+    border: 1px solid var(--border-light);
+    cursor: grab;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    user-select: none;
+  }
+  .k-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 14px 14px 0 0;
+  }
+  .k-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(0,0,0,0.09);
+  }
+  .k-card:active { cursor: grabbing; }
+  .k-card.dragging {
+    opacity: 0.4;
+    transform: scale(0.97);
+    box-shadow: none;
+  }
+
+  /* accent bar color driven by --card-accent CSS var set per card in JS */
+  .k-card::before { background: var(--card-accent, linear-gradient(90deg, #0071E3, #5E5CE6)); }
+
+  .k-card-name {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    color: var(--text);
+    margin-bottom: 5px;
+    line-height: 1.3;
+  }
+  .k-card-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.55;
+    margin-bottom: 12px;
+    letter-spacing: -0.08px;
+  }
+  .k-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .k-card-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ── Priority badges ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 980px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .badge-high   { background: var(--red-soft);    color: #C0392B; border: 1px solid rgba(255,59,48,0.22); }
+  .badge-medium { background: var(--yellow-soft);  color: #B36200; border: 1px solid rgba(255,159,10,0.22); }
+  .badge-low    { background: var(--green-soft);   color: #1E8A3C; border: 1px solid rgba(52,199,89,0.22); }
+
+  /* ── Suggested column hint ── */
+  .suggested-hint {
+    margin: 10px 12px 0;
+    padding: 10px 12px;
+    background: rgba(110,110,115,0.06);
+    border-radius: 10px;
+    border: 1px dashed rgba(110,110,115,0.22);
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+    letter-spacing: -0.08px;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    background: var(--grad-footer);
+    border-top: 1px solid rgba(94,92,230,0.12);
+    padding: 24px;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: -0.12px;
+  }
+
+  @media (max-width: 900px) {
+    .board-wrap { padding: 20px 16px 40px; }
+  }
+
+  /* ── Card click cursor ── */
+  .k-card { cursor: pointer; }
+  .k-card:active { cursor: grabbing; }
+
+  /* ── Modal backdrop ── */
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.38);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    animation: backdropIn 0.18s ease;
+  }
+  .modal-backdrop.open { display: flex; }
+
+  @keyframes backdropIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* ── Modal panel ── */
+  .modal {
+    background: #FFFFFF;
+    border-radius: 22px;
+    width: 100%;
+    max-width: 620px;
+    max-height: 88vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.22), 0 2px 12px rgba(0,0,0,0.08);
+    animation: modalIn 0.2s cubic-bezier(0.34,1.26,0.64,1);
+    position: relative;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.94) translateY(12px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* ── Modal header ── */
+  .modal-header {
+    position: relative;
+    padding: 28px 28px 0;
+    overflow: hidden;
+  }
+  .modal-accent-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    border-radius: 22px 22px 0 0;
+  }
+  .modal-close {
+    position: absolute;
+    top: 20px; right: 20px;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1;
+    transition: background 0.15s, color 0.15s;
+    z-index: 10;
+  }
+  .modal-close:hover { background: var(--border-light); color: var(--text); }
+
+  .modal-badge-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    margin-bottom: 12px;
+  }
+  .modal-title {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.374px;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .modal-oneliner {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.55;
+    letter-spacing: -0.12px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  /* ── Modal body ── */
+  .modal-body {
+    padding: 20px 28px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .scope-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .scope-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-light);
+  }
+
+  /* trigger → action → output flow */
+  .flow-row {
+    display: grid;
+    grid-template-columns: 1fr 18px 1fr 18px 1fr;
+    gap: 0;
+    align-items: start;
+  }
+  .flow-box {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--border-light);
+  }
+  .flow-box-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+  .flow-box-text {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 22px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  /* steps list */
+  .steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .step-num {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-text {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.55;
+  }
+
+  /* tools row */
+  .tools-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tool-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text2);
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: 4px 10px;
+    letter-spacing: -0.08px;
+  }
+
+  /* metrics row */
+  .metrics-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .metric-box {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid var(--border-light);
+    text-align: center;
+  }
+  .metric-val {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+  .metric-label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: -0.08px;
+  }
+
+  /* notion link button */
+  .notion-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 9px 16px;
+    text-decoration: none;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    letter-spacing: -0.12px;
+  }
+  .notion-btn:hover {
+    background: var(--border-light);
+    border-color: var(--border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    text-decoration: none;
+  }
+  .notion-btn svg { flex-shrink: 0; }
+
+  /* notes box */
+  .notes-box {
+    background: var(--accent-soft);
+    border-radius: 12px;
+    padding: 14px 16px;
+    border: 1px solid rgba(0,113,227,0.14);
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav">
+  <a href="ai-builder-plan.html">Automation Plan</a>
+  <a href="#" class="active">Dashboard</a>
+  <a href="time-audit.html">Time Audit</a>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-badge">
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" fill="#5E5CE6"/></svg>
+    AI Builder — Sprint 1
+  </div>
+  <h1>Automation Roadmap</h1>
+  <div class="hero-sub">Drag cards between columns &nbsp;·&nbsp; Progress saves automatically</div>
+</div>
+
+<!-- Board -->
+<div class="board-wrap">
+  <div class="board" id="board">
+
+    <!-- ── SUGGESTED ── -->
+    <div class="column col-suggested" data-col="suggested">
+      <div class="col-header">
+        <div class="col-title">
+          <span class="col-dot"></span>
+          Suggested
+        </div>
+        <span class="col-count" id="count-suggested">0</span>
+      </div>
+      <div class="suggested-hint">Ideas from others will appear here. Drag anything worth building into To Build.</div>
+      <div class="drop-zone" id="zone-suggested" data-col="suggested" data-empty="No suggestions yet"></div>
+    </div>
+
+    <!-- ── TO BUILD ── -->
+    <div class="column col-to-build" data-col="to-build">
+      <div class="col-header">
+        <div class="col-title">
+          <span class="col-dot"></span>
+          To Build
+        </div>
+        <span class="col-count" id="count-to-build">0</span>
+      </div>
+      <div class="drop-zone" id="zone-to-build" data-col="to-build" data-empty="Nothing queued"></div>
+    </div>
+
+    <!-- ── IN PROGRESS ── -->
+    <div class="column col-in-progress" data-col="in-progress">
+      <div class="col-header">
+        <div class="col-title">
+          <span class="col-dot"></span>
+          In Progress
+        </div>
+        <span class="col-count" id="count-in-progress">0</span>
+      </div>
+      <div class="drop-zone" id="zone-in-progress" data-col="in-progress" data-empty="Nothing active"></div>
+    </div>
+
+    <!-- ── DONE ── -->
+    <div class="column col-done" data-col="done">
+      <div class="col-header">
+        <div class="col-title">
+          <span class="col-dot"></span>
+          Done
+        </div>
+        <span class="col-count" id="count-done">0</span>
+      </div>
+      <div class="drop-zone" id="zone-done" data-col="done" data-empty="Nothing shipped yet"></div>
+    </div>
+
+  </div><!-- /board -->
+</div><!-- /board-wrap -->
+
+<!-- ── Modal ── -->
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal" id="modal" role="dialog" aria-modal="true">
+    <div class="modal-header" id="modal-header">
+      <div class="modal-accent-bar" id="modal-accent-bar"></div>
+      <button class="modal-close" id="modal-close" aria-label="Close">&#x2715;</button>
+      <div class="modal-badge-row" id="modal-badge-row"></div>
+      <div class="modal-title" id="modal-title"></div>
+      <div class="modal-oneliner" id="modal-oneliner"></div>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<div class="footer">
+  AI Builder Automation Dashboard &nbsp;—&nbsp; April 2026 &nbsp;|&nbsp; Sprint 1
+</div>
+
+<script>
+  // ── Local card metadata (icons + scope doc keys, keyed by Notion card name) ──
+  const CARD_META = {
+    'Weekly Prospect List': {
+      scopeId: 'prospect',
+      accent:  'linear-gradient(90deg, #0071E3, #5E5CE6)',
+      iconBg:  'linear-gradient(135deg, rgba(0,113,227,0.12), rgba(50,173,230,0.12))',
+      icon: `<svg width="16" height="14" viewBox="0 0 16 14" fill="none">
+        <rect x="0" y="2.5" width="10" height="4" rx="0.8" fill="#0071E3" opacity="0.22" stroke="#0071E3" stroke-width="0.9"/>
+        <rect x="0" y="5.5" width="10" height="1" rx="0.5" fill="#0071E3" opacity="0.4"/>
+        <rect x="10" y="1.5" width="5.5" height="5" rx="1" fill="#0071E3"/>
+        <rect x="10.3" y="2.2" width="3" height="3" rx="0.6" fill="white" opacity="0.55"/>
+        <circle cx="2.8" cy="10" r="2" fill="#333336" stroke="white" stroke-width="0.6"/>
+        <circle cx="2.8" cy="10" r="0.8" fill="#8E8E93"/>
+        <circle cx="7.2" cy="10" r="2" fill="#333336" stroke="white" stroke-width="0.6"/>
+        <circle cx="7.2" cy="10" r="0.8" fill="#8E8E93"/>
+        <circle cx="12.5" cy="10" r="2" fill="#333336" stroke="white" stroke-width="0.6"/>
+        <circle cx="12.5" cy="10" r="0.8" fill="#8E8E93"/>
+      </svg>`,
+    },
+    'LinkedIn View Converter': {
+      scopeId: 'linkedin',
+      accent:  'linear-gradient(90deg, #5E5CE6, #BF5AF2)',
+      iconBg:  'linear-gradient(135deg, rgba(94,92,230,0.12), rgba(191,90,242,0.12))',
+      icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="1" y="1" width="14" height="14" rx="3" stroke="#5E5CE6" stroke-width="1.2"/>
+        <circle cx="5" cy="5.5" r="1.2" fill="#5E5CE6"/>
+        <rect x="4.2" y="7.5" width="1.8" height="5" rx="0.9" fill="#5E5CE6"/>
+        <path d="M7.5 7.5h2v1s.5-1 2.2-1 2.2 1.2 2.2 3v2.5h-1.8v-2.2c0-.8-.4-1.3-1.1-1.3s-1.1.5-1.1 1.3v2.2H7.5V7.5z" fill="#5E5CE6"/>
+      </svg>`,
+    },
+    'Follow-Up Cadence': {
+      scopeId: 'followup',
+      accent:  'linear-gradient(90deg, #34C759, #32ADE6)',
+      iconBg:  'linear-gradient(135deg, rgba(52,199,89,0.12), rgba(50,173,230,0.12))',
+      icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="6.5" stroke="#34C759" stroke-width="1.2"/>
+        <path d="M8 4.5v3.7l2.5 1.8" stroke="#34C759" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`,
+    },
+    'Google Alert Digest': {
+      scopeId: 'alert',
+      accent:  'linear-gradient(90deg, #FF9F0A, #FF6B35)',
+      iconBg:  'linear-gradient(135deg, rgba(255,159,10,0.14), rgba(255,107,53,0.12))',
+      icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="1.5" y="2" width="13" height="12" rx="2.2" stroke="#FF9F0A" stroke-width="1.2"/>
+        <rect x="3.5" y="5" width="5" height="1" rx="0.5" fill="#FF9F0A"/>
+        <rect x="3.5" y="7.2" width="9" height="0.9" rx="0.45" fill="#FF9F0A" opacity="0.5"/>
+        <rect x="3.5" y="9" width="7" height="0.9" rx="0.45" fill="#FF9F0A" opacity="0.4"/>
+      </svg>`,
+    },
+    'Inbox Triage': {
+      scopeId: 'inbox',
+      accent:  'linear-gradient(90deg, #0071E3, #32ADE6)',
+      iconBg:  'linear-gradient(135deg, rgba(0,113,227,0.12), rgba(50,173,230,0.12))',
+      icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="1.5" y="3" width="13" height="10" rx="2" stroke="#0071E3" stroke-width="1.2"/>
+        <path d="M1.5 6.5l6.5 3.5 6.5-3.5" stroke="#0071E3" stroke-width="1.1" stroke-linecap="round"/>
+      </svg>`,
+    },
+    'Account Check-Ins': {
+      scopeId: 'checkin',
+      accent:  'linear-gradient(90deg, #32ADE6, #34C759)',
+      iconBg:  'linear-gradient(135deg, rgba(52,199,89,0.12), rgba(50,173,230,0.10))',
+      icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="1.5" y="5" width="7" height="9" rx="1.5" stroke="#34C759" stroke-width="1.2"/>
+        <rect x="3" y="7" width="1.8" height="1.8" rx="0.4" fill="#34C759" opacity="0.5"/>
+        <rect x="5.5" y="7" width="1.8" height="1.8" rx="0.4" fill="#34C759" opacity="0.5"/>
+        <rect x="3" y="10" width="1.8" height="1.8" rx="0.4" fill="#34C759" opacity="0.5"/>
+        <path d="M9 6.5v-2a1 1 0 011-1h2l1.5 2.5V12a1 1 0 01-1 1H9" stroke="#34C759" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="11" cy="12" r="1.5" fill="#34C759" opacity="0.7"/>
+      </svg>`,
+    },
+  };
+
+  // ── Placeholder — old CARDS ref (unused after migration) ─────
+  // CARDS array removed; data now comes from /api/roadmap
+
+  // ── State ─────────────────────────────────────────────────────
+  let apiCards   = [];   // populated from GET /api/roadmap
+  let draggedId  = null;
+  let draggedCard = null;
+
+  // ── Fetch from Notion API ─────────────────────────────────────
+  async function fetchRoadmap() {
+    try {
+      const res = await fetch('/api/roadmap');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      apiCards = data.cards || [];
+      renderBoard();
+    } catch (err) {
+      console.error('fetchRoadmap error:', err);
+      document.getElementById('board').innerHTML =
+        '<div style="padding:48px;color:var(--muted);text-align:center;grid-column:1/-1">' +
+        'Could not load roadmap from Notion. Check console for details.</div>';
+    }
+  }
+
+  // ── Render ────────────────────────────────────────────────────
+  function renderBoard() {
+    const zones = {
+      'suggested':   document.getElementById('zone-suggested'),
+      'to-build':    document.getElementById('zone-to-build'),
+      'in-progress': document.getElementById('zone-in-progress'),
+      'done':        document.getElementById('zone-done'),
+    };
+    Object.values(zones).forEach(z => { z.innerHTML = ''; });
+    apiCards.forEach(card => {
+      const zone = zones[card.column] || zones['to-build'];
+      zone.appendChild(buildCard(card));
+    });
+    updateCounts();
+    attachDrag();
+  }
+
+  // ── Build card from API data ──────────────────────────────────
+  function buildCard(card) {
+    const meta = CARD_META[card.name] || { icon: '', iconBg: 'var(--surface)', accent: 'var(--border)' };
+    const priority = card.priority || 'medium';
+    const el = document.createElement('div');
+    el.className = 'k-card';
+    el.setAttribute('data-id', card.id);
+    el.setAttribute('draggable', 'true');
+    el.style.setProperty('--card-accent', meta.accent);
+    el.innerHTML = `
+      <div class="k-card-name">${card.name}</div>
+      <div class="k-card-desc">${card.description ? card.description.split('.')[0] + '.' : ''}</div>
+      <div class="k-card-footer">
+        <span class="badge badge-${priority}">
+          ${priority.charAt(0).toUpperCase() + priority.slice(1)}
+        </span>
+        <div class="k-card-icon" style="background:${meta.iconBg}">
+          ${meta.icon}
+        </div>
+      </div>
+    `;
+    let dragMoved = false;
+    el.addEventListener('mousedown', () => { dragMoved = false; });
+    el.addEventListener('mousemove', () => { dragMoved = true; });
+    el.addEventListener('click', () => { if (!dragMoved) openModal(card); });
+    return el;
+  }
+
+  function updateCounts() {
+    ['suggested', 'to-build', 'in-progress', 'done'].forEach(col => {
+      const zone  = document.getElementById(`zone-${col}`);
+      const count = zone.querySelectorAll('.k-card').length;
+      document.getElementById(`count-${col}`).textContent = count;
+      zone.classList.toggle('is-empty', count === 0);
+    });
+  }
+
+  // ── Drag and drop ─────────────────────────────────────────────
+  function attachDrag() {
+    document.querySelectorAll('.k-card').forEach(card => {
+      card.addEventListener('dragstart', onDragStart);
+      card.addEventListener('dragend', onDragEnd);
+    });
+    document.querySelectorAll('.drop-zone').forEach(zone => {
+      zone.addEventListener('dragover', onDragOver);
+      zone.addEventListener('dragleave', onDragLeave);
+      zone.addEventListener('drop', onDrop);
+    });
+  }
+
+  function onDragStart(e) {
+    draggedId = e.currentTarget.getAttribute('data-id');
+    draggedCard = apiCards.find(c => c.id === draggedId) || null;
+    e.currentTarget.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', draggedId);
+  }
+
+  function onDragEnd(e) {
+    e.currentTarget.classList.remove('dragging');
+    document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('drag-over'));
+  }
+
+  function onDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    e.currentTarget.classList.add('drag-over');
+  }
+
+  function onDragLeave(e) {
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      e.currentTarget.classList.remove('drag-over');
+    }
+  }
+
+  async function onDrop(e) {
+    e.preventDefault();
+    const zone = e.currentTarget;
+    zone.classList.remove('drag-over');
+    const targetCol = zone.getAttribute('data-col');
+    if (!draggedId || !targetCol || !draggedCard) return;
+
+    const prevCol = draggedCard.column;
+    draggedCard.column = targetCol;   // optimistic update
+    renderBoard();
+
+    try {
+      const res = await fetch('/api/roadmap', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: draggedId, column: targetCol }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    } catch (err) {
+      console.error('PATCH failed, reverting:', err);
+      draggedCard.column = prevCol;   // revert on failure
+      renderBoard();
+    } finally {
+      draggedId   = null;
+      draggedCard = null;
+    }
+  }
+
+  // ── Scope docs ────────────────────────────────────────────────
+  const SCOPE = {
+    prospect: {
+      accentBar: 'linear-gradient(90deg, #0071E3, #5E5CE6)',
+      trigger: 'Sunday night, 10 PM — scheduled Claude routine',
+      action: 'Search east coast manufacturers & distributors in steel, lumber, building materials. Filter by flatbed-compatible freight, geography, and volume signals.',
+      output: 'Formatted 10-prospect list in Gmail by 7 AM Monday — company, contact, freight type, why they fit, outreach angle.',
+      steps: [
+        'Scheduled routine fires Sunday at 10 PM',
+        'Agent searches Google, industry directories, and LinkedIn for east coast shippers matching ICP (steel, lumber, machinery, building materials)',
+        'Filters results by geography (east coast priority), freight type, and volume signals',
+        'Enriches each result: company description, estimated freight volume, decision-maker name/title if findable',
+        'Generates a suggested outreach angle for each prospect based on their freight profile',
+        'Delivers formatted list to Gmail as a structured email by 7 AM Monday',
+      ],
+      tools: ['Claude Scheduled Tasks', 'Chrome / Web Search', 'Gmail'],
+      metrics: [
+        { val: '10', label: 'Prospects/week' },
+        { val: '3–4h', label: 'Reclaimed/week' },
+        { val: '#1', label: 'Impact rank' },
+      ],
+      effort: 'Medium lift — 2–3 hours to build and test the scheduled routine.',
+      note: 'Success metric: at least 2 of 10 weekly prospects become active outreach conversations within 30 days.',
+    },
+    linkedin: {
+      accentBar: 'linear-gradient(90deg, #5E5CE6, #BF5AF2)',
+      trigger: 'LinkedIn notification email lands in Gmail',
+      action: 'Extract viewer name and company, research them, draft a personalized connection message.',
+      output: 'Gmail draft ready to review — researched contact + personalized outreach — within 24 hours of the profile view.',
+      steps: [
+        'Gmail trigger fires when a LinkedIn notification arrives containing "viewed your profile"',
+        'Agent parses the notification to extract viewer name, title, and company',
+        'Agent researches the company: freight type, size, east coast presence, any ICP signals',
+        'Drafts a personalized LinkedIn connection message (≤300 chars) referencing their freight or industry',
+        'Creates a Gmail draft with the message + research summary for 30-second review',
+      ],
+      tools: ['Gmail MCP', 'Chrome / Web Search', 'Claude Agent'],
+      metrics: [
+        { val: '29–33', label: 'Weekly profile views' },
+        { val: '2h', label: 'Reclaimed/week' },
+        { val: '<24h', label: 'Response window' },
+      ],
+      effort: 'Quick win — ~1.5 hours to build the Gmail trigger and research routine.',
+      note: 'Currently 29–33 weekly profile views go entirely unactioned. Even converting 10% into conversations compounds fast.',
+    },
+    followup: {
+      accentBar: 'linear-gradient(90deg, #34C759, #32ADE6)',
+      trigger: 'Outreach email sent from Gmail to a prospect',
+      action: 'Generate follow-up draft sequence at +3, +7, and +14 days. Each with a fresh angle.',
+      output: 'Three queued Gmail drafts per prospect — ready to approve or skip in one click.',
+      steps: [
+        'Gmail trigger detects outbound email to a new prospect address',
+        'Agent logs the contact and send date',
+        'Scheduled tasks created: +3 day, +7 day, +14 day follow-up',
+        'At each interval, agent reviews the original thread, generates a follow-up with a new angle (social proof, capacity update, market rate color)',
+        'Draft queued in Gmail — one-click approve or delete',
+        'If prospect replies at any point, remaining follow-ups are automatically cancelled',
+      ],
+      tools: ['Gmail MCP', 'Claude Scheduled Tasks', 'Claude Agent'],
+      metrics: [
+        { val: '+3/7/14', label: 'Day cadence' },
+        { val: '2–3h', label: 'Reclaimed/week' },
+        { val: '#3', label: 'Impact rank' },
+      ],
+      effort: 'Medium lift — ~3 hours to build the trigger, sequencing logic, and cancellation handler.',
+      note: 'Most deals close on follow-up 3–5, not follow-up 1. This prevents any prospect from going cold by default.',
+    },
+    alert: {
+      accentBar: 'linear-gradient(90deg, #FF9F0A, #FF6B35)',
+      trigger: 'Google Alert email for "Flatbed Owner Operator" arrives in Gmail',
+      action: 'Read linked articles, extract signals, flag ICP companies, surface one action item.',
+      output: 'A 5-line digest reply in Gmail — key signal, flagged company names, one "do this today" action.',
+      steps: [
+        'Gmail trigger fires when Google Alert email arrives',
+        'Agent opens each article link and extracts key content',
+        'Summarizes into 2–3 industry signals relevant to flatbed capacity or shipper demand',
+        'Scans for company names and cross-references against ICP criteria (east coast, flatbed freight)',
+        'Generates one specific action: "Call [Company] — they announced expansion into [market]"',
+        'Replies inline to the alert email with the digest — keeps it threaded and easy to find',
+      ],
+      tools: ['Gmail MCP', 'Chrome / Web Search', 'Claude Agent'],
+      metrics: [
+        { val: 'Daily', label: 'Alert frequency' },
+        { val: '1h+', label: 'Reclaimed/week' },
+        { val: '5 lines', label: 'Digest length' },
+      ],
+      effort: 'Quick win — ~1 hour. Simple trigger-read-summarize-reply loop.',
+      note: 'The alert arrives daily but currently takes 15–30 min to process manually — if it gets processed at all.',
+    },
+    inbox: {
+      accentBar: 'linear-gradient(90deg, #0071E3, #32ADE6)',
+      trigger: 'Scheduled — 7 AM daily, before first inbox open',
+      action: 'Scan inbox, label and archive noise, flag revenue-relevant threads, send summary.',
+      output: '"Your inbox in 60 seconds" email at top of inbox — only things that need a response.',
+      steps: [
+        'Scheduled routine fires at 7 AM Monday–Friday',
+        'Agent scans unread emails from the last 24 hours',
+        'Labels and archives: Zillow alerts, retail marketing (Under Armour, TaylorMade, Harbor Freight), newsletters',
+        'Flags and stars: emails from JRC domains, known shipper contacts, RFQ-related threads',
+        'Generates a plain-text summary: "3 emails need you today — [subject 1], [subject 2], [subject 3]"',
+        'Sends summary as first email in inbox so it appears at top on open',
+      ],
+      tools: ['Gmail MCP', 'Claude Scheduled Tasks', 'Claude Agent'],
+      metrics: [
+        { val: '~30m', label: 'Reclaimed/day' },
+        { val: '57%', label: 'Email was browser time' },
+        { val: '7 AM', label: 'Daily trigger' },
+      ],
+      effort: 'Quick win — ~1.5 hours. Label rules + summary generation.',
+      note: 'Gmail visits were 845 in 3 weeks — 57% of all browser activity. Triage cuts reactive email time in half.',
+    },
+    checkin: {
+      accentBar: 'linear-gradient(90deg, #32ADE6, #34C759)',
+      trigger: 'Monthly — 1st of each month, for each named account',
+      action: 'Draft a brief relationship email with lane update, market rate color, and capacity availability.',
+      output: 'Gmail drafts for each account — personalize and send in under 2 minutes per account.',
+      steps: [
+        'Scheduled routine fires on the 1st of each month',
+        'Agent iterates through named account list (Home Depot, etc.)',
+        'Pulls recent lane activity or rate context if available',
+        'Drafts a 3–4 sentence email: acknowledge the relationship, share one piece of market color, mention capacity or new lane availability',
+        'Queues as Gmail draft — takes under 2 minutes to personalize and send',
+        'Logs send date so cadence stays consistent without manual tracking',
+      ],
+      tools: ['Gmail MCP', 'Claude Scheduled Tasks', 'Google Drive'],
+      metrics: [
+        { val: 'Monthly', label: 'Cadence' },
+        { val: '1–2h', label: 'Reclaimed/month' },
+        { val: '∞', label: 'Relationship ROI' },
+      ],
+      effort: 'Quick win — ~1 hour. Scheduled loop with Gmail draft generation.',
+      note: 'Account expansion is currently ops-driven, not sales-driven. This makes relationship-building proactive.',
+    },
+  };
+
+  // ── Modal logic ───────────────────────────────────────────────
+  const backdrop   = document.getElementById('modal-backdrop');
+  const modalClose = document.getElementById('modal-close');
+
+  function openModal(card) {
+    const meta  = CARD_META[card.name] || {};
+    const scope = meta.scopeId ? SCOPE[meta.scopeId] : null;
+
+    document.getElementById('modal-accent-bar').style.background =
+      (scope ? scope.accentBar : null) || meta.accent || 'var(--grad-blue-purple)';
+    document.getElementById('modal-title').textContent    = card.name;
+    document.getElementById('modal-oneliner').textContent = card.description || '';
+
+    const priority = card.priority || 'medium';
+    document.getElementById('modal-badge-row').innerHTML =
+      `<span class="badge badge-${priority}">${priority.charAt(0).toUpperCase() + priority.slice(1)} Priority</span>`;
+
+    const notionBtn = card.notionUrl ? `
+      <div>
+        <a href="${card.notionUrl}" target="_blank" rel="noopener" class="notion-btn">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <rect x="2" y="1" width="12" height="14" rx="2" fill="#fff" stroke="#E8E8ED" stroke-width="1.2"/>
+            <rect x="4" y="4" width="8" height="1.2" rx="0.6" fill="#1D1D1F"/>
+            <rect x="4" y="6.5" width="6" height="1" rx="0.5" fill="#6E6E73"/>
+            <rect x="4" y="8.8" width="7" height="1" rx="0.5" fill="#6E6E73"/>
+            <rect x="4" y="11" width="5" height="1" rx="0.5" fill="#6E6E73"/>
+          </svg>
+          View in Notion
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="margin-left:2px">
+            <path d="M2.5 6h7M6.5 3l3 3-3 3" stroke="#6E6E73" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>` : '';
+
+    const body = document.getElementById('modal-body');
+
+    if (scope) {
+      body.innerHTML = `
+        <div>
+          <div class="scope-section-label">How it works</div>
+          <div class="flow-row">
+            <div class="flow-box"><div class="flow-box-label">Trigger</div><div class="flow-box-text">${scope.trigger}</div></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box"><div class="flow-box-label">Action</div><div class="flow-box-text">${scope.action}</div></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box"><div class="flow-box-label">Output</div><div class="flow-box-text">${scope.output}</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="scope-section-label">Build steps</div>
+          <div class="steps-list">
+            ${scope.steps.map((s, i) => `<div class="step-item"><div class="step-num">${i + 1}</div><div class="step-text">${s}</div></div>`).join('')}
+          </div>
+        </div>
+        <div>
+          <div class="scope-section-label">Tools</div>
+          <div class="tools-row">
+            ${scope.tools.map(t => `<span class="tool-chip"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="var(--muted)" stroke-width="1.2"/><path d="M3 5h4M5 3v4" stroke="var(--muted)" stroke-width="1" stroke-linecap="round"/></svg>${t}</span>`).join('')}
+          </div>
+        </div>
+        <div>
+          <div class="scope-section-label">Success metrics</div>
+          <div class="metrics-row">
+            ${scope.metrics.map(m => `<div class="metric-box"><div class="metric-val">${m.val}</div><div class="metric-label">${m.label}</div></div>`).join('')}
+          </div>
+        </div>
+        <div>
+          <div class="scope-section-label">Effort &amp; notes</div>
+          <div class="notes-box"><strong>Effort:</strong> ${scope.effort}<br><br>${scope.note}</div>
+        </div>
+        ${notionBtn}
+      `;
+    } else {
+      // Fallback for Suggested cards or any card without a local scope doc
+      body.innerHTML = `
+        <div>
+          <div class="scope-section-label">Description</div>
+          <div class="notes-box">${card.description || 'No description yet.'}</div>
+        </div>
+        ${card.projectSpec ? `
+        <div>
+          <div class="scope-section-label">Project Spec</div>
+          <div class="notes-box" style="white-space:pre-wrap;font-size:12px">${card.projectSpec}</div>
+        </div>` : ''}
+        ${notionBtn}
+      `;
+    }
+
+    backdrop.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    backdrop.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  modalClose.addEventListener('click', closeModal);
+  backdrop.addEventListener('click', e => { if (e.target === backdrop) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // ── Init ──────────────────────────────────────────────────────
+  fetchRoadmap();
+</script>
+      icon: `<svg width="16" height="14" viewBox="0 0 16 14" fill="none">
+        <rect x="0" y="2.5" width="10" height="4" rx="0.8" fill="#0071E3" opacity="0.22" stroke="#0071E3" stroke-width="0.9"/>
+        <rect x="0" y="5.5" width="10" height="1" rx="0.5" fill="#0071E3" opacity="0.4"/>
+        <rect x="10" y="1.5" width="5.5" height="5" rx="1" fill="#0071E3"/>
+        <rect x="10.3" y="2.2" width="3" height="3" rx="0.6" fill="white" opacity="0.55"/>
+        <circle cx="2.8" cy="10" r="2" fill="#333336" stroke="white" stroke-width="0.6"/>
+        <circle cx="2.8" cy="10" r="0.8" fill="#8E8E93"/>
+        <circle cx="7.2" cy="10" r="2" fill="#333336" stroke="white" stroke-width="0.6"/>
+        <circle cx="7.2" cy="10" r="0.8" fill="#8E8E93"/>
+        <circle cx="12.5" cy="10" r="2" fill="#333336" stroke="white" stroke-width="0.6"/>
+        <circle cx="12.5" cy="10" r="0.8" fill="#8E8E93"/>
+      </svg>`,
+      iconBg: 'linear-gradient(135deg, rgba(0,113,227,0.12), rgba(50,173,230,0.12))',
+      defaultCol: 'to-build',
+    },
+    {
+      id: 'linkedin',
+      name: 'LinkedIn View Converter',
+      desc: 'Profile views turned into researched contacts with a draft outreach message in 24 hours.',
+      priority: 'high',
+      notionUrl: 'https://www.notion.so/3500e845aa758127b65ae58691a2e40a',
+      icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="1" y="1" width="14" height="14" rx="3" stroke="#5E5CE6" stroke-width="1.2"/>
+        <circle cx="5" cy="5.5" r="1.2" fill="#5E5CE6"/>
+        <rect x="4.2" y="7.5" width="1.8" height="5" rx="0.9" fill="#5E5CE6"/>
+        <path d="M7.5 7.5h2v1s.5-1 2.2-1 2.2 1.2 2.2 3v2.5h-1.8v-2.2c0-.8-.4-1.3-1.1-1.3s-1.1.5-1.1 1.3v2.2H7.5V7.5z" fill="#5E5CE6"/>
+      </svg>`,
+      iconBg: 'linear-gradient(135deg, rgba(94,92,230,0.12), rgba(191,90,242,0.12))',
+      defaultCol: 'to-build',
+    },
+    {
+      id: 'followup',
+      name: 'Follow-Up Cadence',
+      desc: 'Scheduled follow-ups for every prospect so nothing goes cold because I forgot.',
+      priority: 'medium',
+      notionUrl: 'https://www.notion.so/3500e845aa7581519b0dc8e36b1740f6',
+      icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="6.5" stroke="#34C759" stroke-width="1.2"/>
+        <path d="M8 4.5v3.7l2.5 1.8" stroke="#34C759" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`,
+      iconBg: 'linear-gradient(135deg, rgba(52,199,89,0.12), rgba(50,173,230,0.12))',
+      defaultCol: 'to-build',
+    },
+    {
+      id: 'alert',
+      name: 'Google Alert Digest',
+      desc: 'Industry alerts condensed into a 3-bullet brief with one actionable item daily.',
+      priority: 'medium',
+      notionUrl: 'https://www.notion.so/3500e845aa758149b540f570c2640148',
+      icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="1.5" y="2" width="13" height="12" rx="2.2" stroke="#FF9F0A" stroke-width="1.2"/>
+        <rect x="3.5" y="5" width="5" height="1" rx="0.5" fill="#FF9F0A"/>
+        <rect x="3.5" y="7.2" width="9" height="0.9" rx="0.45" fill="#FF9F0A" opacity="0.5"/>
+        <rect x="3.5" y="9" width="7" height="0.9" rx="0.45" fill="#FF9F0A" opacity="0.4"/>
+      </svg>`,
+      iconBg: 'linear-gradient(135deg, rgba(255,159,10,0.14), rgba(255,107,53,0.12))',
+      defaultCol: 'to-build',
+    },
+    {
+      id: 'inbox',
+      name: 'Inbox Triage',
+      desc: 'Auto-sort Gmail so only revenue-relevant emails reach you each morning.',
+      priority: 'medium',
+      notionUrl: 'https://www.notion.so/3500e845aa75810eb79ed294be063eef',
+      icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="1.5" y="3" width="13" height="10" rx="2" stroke="#0071E3" stroke-width="1.2"/>
+        <path d="M1.5 6.5l6.5 3.5 6.5-3.5" stroke="#0071E3" stroke-width="1.1" stroke-linecap="round"/>
+      </svg>`,
+      iconBg: 'linear-gradient(135deg, rgba(0,113,227,0.12), rgba(50,173,230,0.12))',
+      defaultCol: 'to-build',
+    },
+    {
+      id: 'checkin',
+      name: 'Account Check-Ins',
+      desc: 'Monthly proactive rate and lane touches to existing accounts like Home Depot.',
+      priority: 'low',
+      notionUrl: 'https://www.notion.so/3500e845aa7581928d61c2d6c5a37648',
+      icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="1.5" y="5" width="7" height="9" rx="1.5" stroke="#34C759" stroke-width="1.2"/>
+        <rect x="3" y="7" width="1.8" height="1.8" rx="0.4" fill="#34C759" opacity="0.5"/>
+        <rect x="5.5" y="7" width="1.8" height="1.8" rx="0.4" fill="#34C759" opacity="0.5"/>
+        <rect x="3" y="10" width="1.8" height="1.8" rx="0.4" fill="#34C759" opacity="0.5"/>
+        <path d="M9 6.5v-2a1 1 0 011-1h2l1.5 2.5V12a1 1 0 01-1 1H9" stroke="#34C759" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="11" cy="12" r="1.5" fill="#34C759" opacity="0.7"/>
+      </svg>`,
+      iconBg: 'linear-gradient(135deg, rgba(52,199,89,0.12), rgba(50,173,230,0.10))',
+      defaultCol: 'to-build',
+    },
+  ];
+
+  // ── State ─────────────────────────────────────────────────────
+  const STORAGE_KEY = 'ai-builder-kanban-v1';
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch { return {}; }
+  }
+
+  function saveState(state) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function getCardCol(id, state) {
+    return state[id] || CARDS.find(c => c.id === id).defaultCol;
+  }
+
+  // ── Render ────────────────────────────────────────────────────
+  function buildCard(card) {
+    const el = document.createElement('div');
+    el.className = 'k-card';
+    el.setAttribute('data-id', card.id);
+    el.setAttribute('draggable', 'true');
+    el.innerHTML = `
+      <div class="k-card-name">${card.name}</div>
+      <div class="k-card-desc">${card.desc}</div>
+      <div class="k-card-footer">
+        <span class="badge badge-${card.priority}">
+          ${card.priority.charAt(0).toUpperCase() + card.priority.slice(1)}
+        </span>
+        <div class="k-card-icon" style="background:${card.iconBg}">
+          ${card.icon}
+        </div>
+      </div>
+    `;
+    // distinguish click from drag: only open modal if mouse didn't move much
+    let dragMoved = false;
+    el.addEventListener('mousedown', () => { dragMoved = false; });
+    el.addEventListener('mousemove', () => { dragMoved = true; });
+    el.addEventListener('click', () => { if (!dragMoved) openModal(card.id); });
+    return el;
+  }
+
+  function renderBoard() {
+    const state = loadState();
+    const zones = {
+      'suggested':   document.getElementById('zone-suggested'),
+      'to-build':    document.getElementById('zone-to-build'),
+      'in-progress': document.getElementById('zone-in-progress'),
+      'done':        document.getElementById('zone-done'),
+    };
+
+    // Clear zones
+    Object.values(zones).forEach(z => { z.innerHTML = ''; });
+
+    // Place cards
+    CARDS.forEach(card => {
+      const col = getCardCol(card.id, state);
+      const zone = zones[col] || zones['to-build'];
+      zone.appendChild(buildCard(card));
+    });
+
+    updateCounts();
+    attachDrag();
+  }
+
+  function updateCounts() {
+    const cols = ['suggested', 'to-build', 'in-progress', 'done'];
+    cols.forEach(col => {
+      const zone = document.getElementById(`zone-${col}`);
+      const count = zone.querySelectorAll('.k-card').length;
+      document.getElementById(`count-${col}`).textContent = count;
+      zone.classList.toggle('is-empty', count === 0);
+    });
+  }
+
+  // ── Drag and drop ─────────────────────────────────────────────
+  let draggedId = null;
+
+  function attachDrag() {
+    document.querySelectorAll('.k-card').forEach(card => {
+      card.addEventListener('dragstart', onDragStart);
+      card.addEventListener('dragend', onDragEnd);
+    });
+
+    document.querySelectorAll('.drop-zone').forEach(zone => {
+      zone.addEventListener('dragover', onDragOver);
+      zone.addEventListener('dragleave', onDragLeave);
+      zone.addEventListener('drop', onDrop);
+    });
+  }
+
+  function onDragStart(e) {
+    draggedId = e.currentTarget.getAttribute('data-id');
+    e.currentTarget.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', draggedId);
+  }
+
+  function onDragEnd(e) {
+    e.currentTarget.classList.remove('dragging');
+    document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('drag-over'));
+  }
+
+  function onDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    e.currentTarget.classList.add('drag-over');
+  }
+
+  function onDragLeave(e) {
+    // Only remove if leaving the zone itself (not a child)
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      e.currentTarget.classList.remove('drag-over');
+    }
+  }
+
+  function onDrop(e) {
+    e.preventDefault();
+    const zone = e.currentTarget;
+    zone.classList.remove('drag-over');
+    const targetCol = zone.getAttribute('data-col');
+    if (!draggedId || !targetCol) return;
+
+    const state = loadState();
+    state[draggedId] = targetCol;
+    saveState(state);
+    renderBoard();
+    draggedId = null;
+  }
+
+  // ── Scope docs ────────────────────────────────────────────────
+  const SCOPE = {
+    prospect: {
+      accentBar: 'linear-gradient(90deg, #0071E3, #5E5CE6)',
+      trigger: 'Sunday night, 10 PM — scheduled Claude routine',
+      action: 'Search east coast manufacturers & distributors in steel, lumber, building materials. Filter by flatbed-compatible freight, geography, and volume signals.',
+      output: 'Formatted 10-prospect list in Gmail by 7 AM Monday — company, contact, freight type, why they fit, outreach angle.',
+      steps: [
+        'Scheduled routine fires Sunday at 10 PM',
+        'Agent searches Google, industry directories, and LinkedIn for east coast shippers matching ICP (steel, lumber, machinery, building materials)',
+        'Filters results by geography (east coast priority), freight type, and volume signals',
+        'Enriches each result: company description, estimated freight volume, decision-maker name/title if findable',
+        'Generates a suggested outreach angle for each prospect based on their freight profile',
+        'Delivers formatted list to Gmail as a structured email by 7 AM Monday',
+      ],
+      tools: ['Claude Scheduled Tasks', 'Chrome / Web Search', 'Gmail'],
+      metrics: [
+        { val: '10', label: 'Prospects/week' },
+        { val: '3–4h', label: 'Reclaimed/week' },
+        { val: '#1', label: 'Impact rank' },
+      ],
+      effort: 'Medium lift — 2–3 hours to build and test the scheduled routine.',
+      note: 'Success metric: at least 2 of 10 weekly prospects become active outreach conversations within 30 days.',
+    },
+    linkedin: {
+      accentBar: 'linear-gradient(90deg, #5E5CE6, #BF5AF2)',
+      trigger: 'LinkedIn notification email lands in Gmail',
+      action: 'Extract viewer name and company, research them, draft a personalized connection message.',
+      output: 'Gmail draft ready to review — researched contact + personalized outreach — within 24 hours of the profile view.',
+      steps: [
+        'Gmail trigger fires when a LinkedIn notification arrives containing "viewed your profile"',
+        'Agent parses the notification to extract viewer name, title, and company',
+        'Agent researches the company: freight type, size, east coast presence, any ICP signals',
+        'Drafts a personalized LinkedIn connection message (≤300 chars) referencing their freight or industry',
+        'Creates a Gmail draft with the message + research summary for 30-second review',
+      ],
+      tools: ['Gmail MCP', 'Chrome / Web Search', 'Claude Agent'],
+      metrics: [
+        { val: '29–33', label: 'Weekly profile views' },
+        { val: '2h', label: 'Reclaimed/week' },
+        { val: '<24h', label: 'Response window' },
+      ],
+      effort: 'Quick win — ~1.5 hours to build the Gmail trigger and research routine.',
+      note: 'Currently 29–33 weekly profile views go entirely unactioned. Even converting 10% into conversations compounds fast.',
+    },
+    followup: {
+      accentBar: 'linear-gradient(90deg, #34C759, #32ADE6)',
+      trigger: 'Outreach email sent from Gmail to a prospect',
+      action: 'Generate follow-up draft sequence at +3, +7, and +14 days. Each with a fresh angle.',
+      output: 'Three queued Gmail drafts per prospect — ready to approve or skip in one click.',
+      steps: [
+        'Gmail trigger detects outbound email to a new prospect address',
+        'Agent logs the contact and send date',
+        'Scheduled tasks created: +3 day, +7 day, +14 day follow-up',
+        'At each interval, agent reviews the original thread, generates a follow-up with a new angle (social proof, capacity update, market rate color)',
+        'Draft queued in Gmail — one-click approve or delete',
+        'If prospect replies at any point, remaining follow-ups are automatically cancelled',
+      ],
+      tools: ['Gmail MCP', 'Claude Scheduled Tasks', 'Claude Agent'],
+      metrics: [
+        { val: '+3/7/14', label: 'Day cadence' },
+        { val: '2–3h', label: 'Reclaimed/week' },
+        { val: '#3', label: 'Impact rank' },
+      ],
+      effort: 'Medium lift — ~3 hours to build the trigger, sequencing logic, and cancellation handler.',
+      note: 'Most deals close on follow-up 3–5, not follow-up 1. This prevents any prospect from going cold by default.',
+    },
+    alert: {
+      accentBar: 'linear-gradient(90deg, #FF9F0A, #FF6B35)',
+      trigger: 'Google Alert email for "Flatbed Owner Operator" arrives in Gmail',
+      action: 'Read linked articles, extract signals, flag ICP companies, surface one action item.',
+      output: 'A 5-line digest reply in Gmail — key signal, flagged company names, one "do this today" action.',
+      steps: [
+        'Gmail trigger fires when Google Alert email arrives',
+        'Agent opens each article link and extracts key content',
+        'Summarizes into 2–3 industry signals relevant to flatbed capacity or shipper demand',
+        'Scans for company names and cross-references against ICP criteria (east coast, flatbed freight)',
+        'Generates one specific action: "Call [Company] — they announced expansion into [market]"',
+        'Replies inline to the alert email with the digest — keeps it threaded and easy to find',
+      ],
+      tools: ['Gmail MCP', 'Chrome / Web Search', 'Claude Agent'],
+      metrics: [
+        { val: 'Daily', label: 'Alert frequency' },
+        { val: '1h+', label: 'Reclaimed/week' },
+        { val: '5 lines', label: 'Digest length' },
+      ],
+      effort: 'Quick win — ~1 hour. Simple trigger-read-summarize-reply loop.',
+      note: 'The alert arrives daily but currently takes 15–30 min to process manually — if it gets processed at all.',
+    },
+    inbox: {
+      accentBar: 'linear-gradient(90deg, #0071E3, #32ADE6)',
+      trigger: 'Scheduled — 7 AM daily, before first inbox open',
+      action: 'Scan inbox, label and archive noise, flag revenue-relevant threads, send summary.',
+      output: '"Your inbox in 60 seconds" email at top of inbox — only things that need a response.',
+      steps: [
+        'Scheduled routine fires at 7 AM Monday–Friday',
+        'Agent scans unread emails from the last 24 hours',
+        'Labels and archives: Zillow alerts, retail marketing (Under Armour, TaylorMade, Harbor Freight), newsletters',
+        'Flags and stars: emails from JRC domains, known shipper contacts, RFQ-related threads',
+        'Generates a plain-text summary: "3 emails need you today — [subject 1], [subject 2], [subject 3]"',
+        'Sends summary as first email in inbox so it appears at top on open',
+      ],
+      tools: ['Gmail MCP', 'Claude Scheduled Tasks', 'Claude Agent'],
+      metrics: [
+        { val: '~30m', label: 'Reclaimed/day' },
+        { val: '57%', label: 'Email was browser time' },
+        { val: '7 AM', label: 'Daily trigger' },
+      ],
+      effort: 'Quick win — ~1.5 hours. Label rules + summary generation.',
+      note: 'Gmail visits were 845 in 3 weeks — 57% of all browser activity. Triage cuts reactive email time in half.',
+    },
+    checkin: {
+      accentBar: 'linear-gradient(90deg, #32ADE6, #34C759)',
+      trigger: 'Monthly — 1st of each month, for each named account',
+      action: 'Draft a brief relationship email with lane update, market rate color, and capacity availability.',
+      output: 'Gmail drafts for each account — personalize and send in under 2 minutes per account.',
+      steps: [
+        'Scheduled routine fires on the 1st of each month',
+        'Agent iterates through named account list (Home Depot, etc.)',
+        'Pulls recent lane activity or rate context if available',
+        'Drafts a 3–4 sentence email: acknowledge the relationship, share one piece of market color, mention capacity or new lane availability',
+        'Queues as Gmail draft — takes under 2 minutes to personalize and send',
+        'Logs send date so cadence stays consistent without manual tracking',
+      ],
+      tools: ['Gmail MCP', 'Claude Scheduled Tasks', 'Google Drive'],
+      metrics: [
+        { val: 'Monthly', label: 'Cadence' },
+        { val: '1–2h', label: 'Reclaimed/month' },
+        { val: '∞', label: 'Relationship ROI' },
+      ],
+      effort: 'Quick win — ~1 hour. Scheduled loop with Gmail draft generation.',
+      note: 'Account expansion is currently ops-driven, not sales-driven. This makes relationship-building proactive.',
+    },
+  };
+
+  // ── Modal logic ───────────────────────────────────────────────
+  const backdrop   = document.getElementById('modal-backdrop');
+  const modalClose = document.getElementById('modal-close');
+
+  function openModal(cardId) {
+    const card  = CARDS.find(c => c.id === cardId);
+    const scope = SCOPE[cardId];
+    if (!card || !scope) return;
+
+    // header
+    document.getElementById('modal-accent-bar').style.background = scope.accentBar;
+    document.getElementById('modal-title').textContent = card.name;
+    document.getElementById('modal-oneliner').textContent = card.desc;
+
+    const badgeRow = document.getElementById('modal-badge-row');
+    badgeRow.innerHTML = `<span class="badge badge-${card.priority}">${card.priority.charAt(0).toUpperCase() + card.priority.slice(1)} Priority</span>`;
+
+    // body
+    const body = document.getElementById('modal-body');
+    body.innerHTML = `
+      <!-- Flow: trigger → action → output -->
+      <div>
+        <div class="scope-section-label">How it works</div>
+        <div class="flow-row">
+          <div class="flow-box">
+            <div class="flow-box-label">Trigger</div>
+            <div class="flow-box-text">${scope.trigger}</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">
+            <div class="flow-box-label">Action</div>
+            <div class="flow-box-text">${scope.action}</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">
+            <div class="flow-box-label">Output</div>
+            <div class="flow-box-text">${scope.output}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Steps -->
+      <div>
+        <div class="scope-section-label">Build steps</div>
+        <div class="steps-list">
+          ${scope.steps.map((s, i) => `
+            <div class="step-item">
+              <div class="step-num">${i + 1}</div>
+              <div class="step-text">${s}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Tools -->
+      <div>
+        <div class="scope-section-label">Tools</div>
+        <div class="tools-row">
+          ${scope.tools.map(t => `<span class="tool-chip">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="var(--muted)" stroke-width="1.2"/><path d="M3 5h4M5 3v4" stroke="var(--muted)" stroke-width="1" stroke-linecap="round"/></svg>
+            ${t}
+          </span>`).join('')}
+        </div>
+      </div>
+
+      <!-- Metrics -->
+      <div>
+        <div class="scope-section-label">Success metrics</div>
+        <div class="metrics-row">
+          ${scope.metrics.map(m => `
+            <div class="metric-box">
+              <div class="metric-val">${m.val}</div>
+              <div class="metric-label">${m.label}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Effort + note -->
+      <div>
+        <div class="scope-section-label">Effort &amp; notes</div>
+        <div class="notes-box"><strong>Effort:</strong> ${scope.effort}<br><br>${scope.note}</div>
+      </div>
+
+      <!-- Notion link -->
+      ${card.notionUrl ? `
+      <div>
+        <a href="${card.notionUrl}" target="_blank" rel="noopener" class="notion-btn">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <rect x="2" y="1" width="12" height="14" rx="2" fill="#fff" stroke="#E8E8ED" stroke-width="1.2"/>
+            <rect x="4" y="4" width="8" height="1.2" rx="0.6" fill="#1D1D1F"/>
+            <rect x="4" y="6.5" width="6" height="1" rx="0.5" fill="#6E6E73"/>
+            <rect x="4" y="8.8" width="7" height="1" rx="0.5" fill="#6E6E73"/>
+            <rect x="4" y="11" width="5" height="1" rx="0.5" fill="#6E6E73"/>
+          </svg>
+          View in Notion
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="margin-left:2px">
+            <path d="M2.5 6h7M6.5 3l3 3-3 3" stroke="#6E6E73" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+      ` : ''}
+    `;
+
+    backdrop.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    backdrop.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  modalClose.addEventListener('click', closeModal);
+  backdrop.addEventListener('click', e => { if (e.target === backdrop) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // ── Init ──────────────────────────────────────────────────────
+  renderBoard();
+</script>
+</body>
+</html>

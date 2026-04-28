@@ -1,0 +1,12 @@
+{
+  "name": "ai-builder",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev --listen 3000"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.2.15",
+    "vercel": "^37.0.0"
+  }
+}

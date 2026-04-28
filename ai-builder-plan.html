@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Builder Plan — Blaise Pope</title>
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --surface: #F5F5F7;
+    --surface2: #F4F8FB;
+    --border: #D2D2D7;
+    --border-light: #E8E8ED;
+    --accent: #0071E3;
+    --accent-hover: #0077ED;
+    --accent-soft: rgba(0,113,227,0.08);
+    --accent2: #5E5CE6;
+    --accent2-soft: rgba(94,92,230,0.08);
+    --green: #34C759;
+    --green-soft: rgba(52,199,89,0.10);
+    --yellow: #FF9F0A;
+    --yellow-soft: rgba(255,159,10,0.10);
+    --red: #FF3B30;
+    --red-soft: rgba(255,59,48,0.10);
+    --text: #1D1D1F;
+    --text2: #333336;
+    --muted: #6E6E73;
+    --label: #3C3C43;
+    /* gradients */
+    --grad-hero: linear-gradient(135deg, #EEF4FF 0%, #F0EEFF 40%, #FFF0FB 100%);
+    --grad-blue-purple: linear-gradient(135deg, #0071E3, #5E5CE6);
+    --grad-blue-teal: linear-gradient(135deg, #0071E3, #32ADE6);
+    --grad-purple-pink: linear-gradient(135deg, #5E5CE6, #BF5AF2);
+    --grad-green-teal: linear-gradient(135deg, #34C759, #32ADE6);
+    --grad-orange-red: linear-gradient(135deg, #FF9F0A, #FF6B35);
+    --grad-pink-purple: linear-gradient(135deg, #FF375F, #BF5AF2);
+    --grad-teal-green: linear-gradient(135deg, #32ADE6, #34C759);
+    --grad-summary-bg: linear-gradient(160deg, #F0F7FF 0%, #F5F0FF 100%);
+    --grad-building-bg: linear-gradient(160deg, #FAFFFE 0%, #F5F8FF 50%, #FFF5FF 100%);
+    --grad-system-bg: linear-gradient(160deg, #F5FFF8 0%, #F0F7FF 100%);
+    --grad-footer: linear-gradient(135deg, #F0EEFF 0%, #EEF4FF 100%);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Nav ── */
+  .nav {
+    background: rgba(255,255,255,0.82);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+    height: 48px;
+    padding: 0 24px;
+  }
+  .nav a {
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: -0.12px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  .nav a:hover { color: var(--text); text-decoration: none; }
+
+  /* ── Layout ── */
+  .page { max-width: 100%; margin: 0; padding: 0; }
+
+  /* ── Hero header ── */
+  .hero {
+    text-align: center;
+    padding: 72px 24px 64px;
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 0;
+    background: var(--grad-hero);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%; transform: translateX(-50%);
+    width: 700px; height: 700px;
+    background: radial-gradient(ellipse at center, rgba(0,113,227,0.08) 0%, rgba(94,92,230,0.06) 40%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, rgba(94,92,230,0.12), rgba(191,90,242,0.12));
+    color: var(--accent2);
+    padding: 4px 14px;
+    border-radius: 980px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(94,92,230,0.22);
+  }
+  .hero h1 {
+    font-size: clamp(72px, 12vw, 148px);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1.0;
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1400 280'><defs><linearGradient id='s' x1='0' y1='0' x2='0' y2='1'><stop offset='0%25' stop-color='%230A1045'/><stop offset='38%25' stop-color='%231849A0'/><stop offset='66%25' stop-color='%23E86020'/><stop offset='84%25' stop-color='%23F4C030'/><stop offset='100%25' stop-color='%23F8D860'/></linearGradient></defs><rect width='1400' height='280' fill='url(%23s)'/><circle cx='700' cy='192' r='44' fill='%23FFD700' opacity='.82'/><circle cx='700' cy='192' r='72' fill='%23FFD700' opacity='.11'/><circle cx='700' cy='192' r='100' fill='%23FFB700' opacity='.05'/><polygon points='0,215 80,148 200,208 340,112 480,200 580,170 700,192 820,172 920,202 1060,118 1200,212 1320,132 1400,216 1400,224 0,224' fill='%230A1C52' opacity='.74'/><rect x='0' y='224' width='1400' height='56' fill='%23161616'/><rect x='10' y='251' width='86' height='4' fill='%23fff' opacity='.48'/><rect x='146' y='251' width='86' height='4' fill='%23fff' opacity='.48'/><rect x='282' y='251' width='86' height='4' fill='%23fff' opacity='.48'/><rect x='418' y='251' width='86' height='4' fill='%23fff' opacity='.48'/><rect x='554' y='251' width='86' height='4' fill='%23fff' opacity='.48'/><rect x='690' y='251' width='86' height='4' fill='%23fff' opacity='.48'/><rect x='826' y='251' width='86' height='4' fill='%23fff' opacity='.48'/><rect x='962' y='251' width='86' height='4' fill='%23fff' opacity='.48'/><rect x='1098' y='251' width='86' height='4' fill='%23fff' opacity='.48'/><rect x='1234' y='251' width='86' height='4' fill='%23fff' opacity='.48'/><rect x='370' y='204' width='250' height='22' rx='2' fill='%23202020'/><rect x='370' y='222' width='250' height='4' fill='%230e0e0e'/><rect x='374' y='182' width='56' height='24' rx='2' fill='%23313131'/><rect x='438' y='187' width='44' height='19' rx='1' fill='%23272727'/><rect x='490' y='192' width='38' height='14' rx='1' fill='%232d2d2d'/><rect x='618' y='192' width='60' height='34' rx='3' fill='%23222'/><rect x='622' y='194' width='33' height='24' rx='2' fill='%23454545'/><rect x='614' y='188' width='62' height='6' rx='2' fill='%232a2a2a'/><rect x='676' y='214' width='2' height='12' fill='%23E86020' opacity='.6'/><circle cx='394' cy='233' r='10' fill='%23101010'/><circle cx='394' cy='233' r='4' fill='%23464646'/><circle cx='444' cy='233' r='10' fill='%23101010'/><circle cx='444' cy='233' r='4' fill='%23464646'/><circle cx='588' cy='233' r='10' fill='%23101010'/><circle cx='588' cy='233' r='4' fill='%23464646'/><circle cx='636' cy='233' r='10' fill='%23101010'/><circle cx='636' cy='233' r='4' fill='%23464646'/><circle cx='662' cy='233' r='8' fill='%23101010'/><circle cx='662' cy='233' r='3' fill='%23464646'/><ellipse cx='168' cy='70' rx='80' ry='22' fill='%23fff' opacity='.15'/><ellipse cx='216' cy='60' rx='56' ry='17' fill='%23fff' opacity='.10'/><ellipse cx='1105' cy='80' rx='90' ry='26' fill='%23fff' opacity='.13'/><ellipse cx='1155' cy='68' rx='65' ry='18' fill='%23fff' opacity='.08'/><ellipse cx='590' cy='50' rx='50' ry='14' fill='%23fff' opacity='.08'/></svg>");
+    background-size: cover;
+    background-position: center 40%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+  }
+  .hero-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 24px;
+    letter-spacing: -0.12px;
+  }
+  .goal-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0,113,227,0.18);
+    border-radius: 14px;
+    padding: 14px 22px;
+    font-size: 15px;
+    color: var(--text2);
+    font-weight: 400;
+    letter-spacing: -0.374px;
+    line-height: 1.4;
+    box-shadow: 0 2px 16px rgba(0,113,227,0.08);
+  }
+  .goal-chip strong { color: var(--accent); font-weight: 600; }
+  .goal-chip .truck-icon { flex-shrink: 0; }
+
+  /* ── Section label ── */
+  .section { margin-bottom: 0; }
+  .section-inner { max-width: 1100px; margin: 0 auto; padding: 56px 24px; }
+
+  .section-summary { background: var(--grad-summary-bg); }
+  .section-building { background: var(--grad-building-bg); }
+  .section-system  { background: var(--grad-system-bg); }
+
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border-light), transparent);
+  }
+  .section-headline {
+    font-size: 34px;
+    font-weight: 600;
+    letter-spacing: -0.374px;
+    line-height: 50px;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .section-headline.grad-blue  { background: var(--grad-blue-teal);    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .section-headline.grad-purple{ background: var(--grad-purple-pink);  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .section-headline.grad-green { background: var(--grad-green-teal);   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .section-desc {
+    font-size: 17px;
+    font-weight: 400;
+    letter-spacing: -0.374px;
+    line-height: 25px;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  /* ── Grid ── */
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 780px) { .grid-3 { grid-template-columns: 1fr; } }
+  @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* ── Insight cards ── */
+  .insight-card {
+    border-radius: 18px;
+    padding: 26px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    border: 1px solid transparent;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .insight-card:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.09); }
+  .insight-card-1 { background: linear-gradient(145deg, #EEF5FF 0%, #E8EEFF 100%); border-color: rgba(0,113,227,0.14); }
+  .insight-card-2 { background: linear-gradient(145deg, #F0EEFF 0%, #F7EEFF 100%); border-color: rgba(94,92,230,0.14); }
+  .insight-card-3 { background: linear-gradient(145deg, #FFF8EE 0%, #FFF0E8 100%); border-color: rgba(255,159,10,0.18); }
+  .insight-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+  .insight-icon.blue   { background: linear-gradient(135deg, rgba(0,113,227,0.14), rgba(50,173,230,0.14)); }
+  .insight-icon.purple { background: linear-gradient(135deg, rgba(94,92,230,0.14), rgba(191,90,242,0.14)); }
+  .insight-icon.orange { background: linear-gradient(135deg, rgba(255,159,10,0.16), rgba(255,107,53,0.14)); }
+  .insight-body {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+  .insight-body strong { color: var(--text); font-weight: 600; }
+  .insight-stat {
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+  .insight-card-1 .insight-stat { background: var(--grad-blue-teal);    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .insight-card-2 .insight-stat { background: var(--grad-purple-pink);  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .insight-card-3 .insight-stat { background: var(--grad-orange-red);   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .insight-stat-label {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: -0.12px;
+  }
+
+  .audit-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    color: var(--accent);
+    font-weight: 400;
+    letter-spacing: -0.12px;
+    margin-top: 4px;
+  }
+  .audit-link:hover { text-decoration: underline; }
+
+  /* ── Automation cards ── */
+  .auto-card {
+    background: #FFFFFF;
+    border-radius: 18px;
+    padding: 28px 28px 24px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--border-light);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .auto-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+  }
+  .auto-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 18px 18px 0 0;
+  }
+  .auto-card-1::before { background: var(--grad-blue-purple); }
+  .auto-card-2::before { background: var(--grad-purple-pink); }
+  .auto-card-3::before { background: var(--grad-green-teal); }
+  .auto-card-4::before { background: var(--grad-orange-red); }
+  .auto-card-5::before { background: var(--grad-blue-teal); }
+  .auto-card-6::before { background: var(--grad-teal-green); }
+  .auto-card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .auto-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .auto-icon.blue   { background: linear-gradient(135deg, rgba(0,113,227,0.12), rgba(50,173,230,0.12)); }
+  .auto-icon.purple { background: linear-gradient(135deg, rgba(94,92,230,0.12), rgba(191,90,242,0.12)); }
+  .auto-icon.green  { background: linear-gradient(135deg, rgba(52,199,89,0.12), rgba(50,173,230,0.12)); }
+  .auto-icon.orange { background: linear-gradient(135deg, rgba(255,159,10,0.14), rgba(255,107,53,0.12)); }
+  .auto-icon.red    { background: linear-gradient(135deg, rgba(255,59,48,0.12), rgba(191,90,242,0.10)); }
+  .auto-header { flex: 1; }
+  .auto-rank {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+  .auto-outcome {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.374px;
+    line-height: 25px;
+    color: var(--text);
+  }
+  .auto-divider {
+    height: 1px;
+    background: var(--border-light);
+    margin-bottom: 20px;
+  }
+  .auto-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 600px) { .auto-cols { grid-template-columns: 1fr; } }
+  .auto-col-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .auto-col-label .dot {
+    width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  }
+  .dot-red { background: var(--red); }
+  .dot-green { background: var(--green); }
+  .auto-col-body {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+  .auto-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-light);
+  }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 980px;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .badge-quick { background: var(--green-soft); color: #1E8A3C; border: 1px solid rgba(52,199,89,0.25); }
+  .badge-medium { background: var(--yellow-soft); color: #B36200; border: 1px solid rgba(255,159,10,0.25); }
+  .badge-big { background: var(--red-soft); color: #C0392B; border: 1px solid rgba(255,59,48,0.25); }
+  .badge-hours { background: var(--accent-soft); color: #005BBB; border: 1px solid rgba(0,113,227,0.20); }
+  .badge-status { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+
+  /* ── Sprint roadmap ── */
+  .sprint-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 600px) { .sprint-grid { grid-template-columns: 1fr; } }
+
+  .sprint-card {
+    background: var(--surface);
+    border: 1px solid transparent;
+    border-radius: 16px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .sprint-card.done {
+    background: linear-gradient(145deg, #EDFFF4 0%, #E8FFF2 60%, #EEFFFE 100%);
+    border-color: rgba(52,199,89,0.28);
+    box-shadow: 0 2px 16px rgba(52,199,89,0.10);
+  }
+  .sprint-card.done:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(52,199,89,0.14); }
+  .sprint-card.done::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--grad-green-teal);
+    border-radius: 16px 16px 0 0;
+  }
+  .sprint-card.pending {
+    opacity: 0.46;
+    border: 1px dashed var(--border);
+    background: linear-gradient(145deg, #F9F9FB 0%, #F5F5F8 100%);
+  }
+  .sprint-sprint-num {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .sprint-card.done .sprint-sprint-num { color: #1E8A3C; }
+  .sprint-card.pending .sprint-sprint-num { color: var(--muted); }
+  .sprint-title-text {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.374px;
+    line-height: 1.35;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .sprint-status-text {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .sprint-card.done .sprint-status-text {
+    color: #1E8A3C;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .sprint-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+  }
+  .sprint-card.done .sprint-icon { background: linear-gradient(135deg, rgba(52,199,89,0.15), rgba(50,173,230,0.12)); }
+  .sprint-card.pending .sprint-icon { background: rgba(0,0,0,0.04); }
+
+  /* ── Footer ── */
+  .footer {
+    background: var(--grad-footer);
+    border-top: 1px solid rgba(94,92,230,0.12);
+    padding: 32px 24px;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: -0.12px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav">
+  <a href="#summary">Time Summary</a>
+  <a href="#building">What I'm Building</a>
+  <a href="#system">My System</a>
+  <a href="time-audit.html">Time Audit</a>
+</nav>
+
+<div class="page">
+
+  <!-- ═══════════════════════ HERO HEADER ═══════════════════════ -->
+  <div class="hero" id="top" style="padding-left:24px;padding-right:24px;">
+    <div class="hero-badge">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" fill="#5E5CE6"/></svg>
+      AI Builder Automation Portfolio
+    </div>
+    <h1>Blaise Pope</h1>
+    <div class="hero-sub">April 21, 2026 &nbsp;·&nbsp; Sprint 1 — Automation Plan</div>
+
+    <!-- Goal chip with truck SVG -->
+    <div class="goal-chip">
+      <!-- Flatbed truck SVG -->
+      <svg class="truck-icon" width="52" height="28" viewBox="0 0 52 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Trailer bed -->
+        <rect x="1" y="8" width="33" height="7" rx="1.5" fill="#0071E3" opacity="0.15" stroke="#0071E3" stroke-width="1.2"/>
+        <!-- Flatbed platform (thin) -->
+        <rect x="1" y="13.5" width="33" height="2" rx="1" fill="#0071E3" opacity="0.35"/>
+        <!-- Cab body -->
+        <rect x="34" y="6" width="16" height="9" rx="2" fill="#0071E3" opacity="0.90"/>
+        <!-- Cab windshield -->
+        <rect x="36" y="7.5" width="8" height="5.5" rx="1" fill="#FFFFFF" opacity="0.6"/>
+        <!-- Cab roof overhang -->
+        <rect x="33" y="5" width="17" height="3" rx="1.5" fill="#0071E3"/>
+        <!-- Hitch / connector -->
+        <rect x="33" y="14" width="2" height="1.5" rx="0.5" fill="#0071E3" opacity="0.5"/>
+        <!-- Trailer wheels -->
+        <circle cx="9" cy="19" r="3.8" fill="#333336" stroke="#F5F5F7" stroke-width="1"/>
+        <circle cx="9" cy="19" r="1.6" fill="#8E8E93"/>
+        <circle cx="21" cy="19" r="3.8" fill="#333336" stroke="#F5F5F7" stroke-width="1"/>
+        <circle cx="21" cy="19" r="1.6" fill="#8E8E93"/>
+        <!-- Cab wheels -->
+        <circle cx="40" cy="19" r="3.8" fill="#333336" stroke="#F5F5F7" stroke-width="1"/>
+        <circle cx="40" cy="19" r="1.6" fill="#8E8E93"/>
+        <circle cx="48" cy="19" r="2.8" fill="#333336" stroke="#F5F5F7" stroke-width="1"/>
+        <circle cx="48" cy="19" r="1.2" fill="#8E8E93"/>
+        <!-- Cargo stacks on flatbed -->
+        <rect x="4" y="4" width="8" height="5" rx="1" fill="#0071E3" opacity="0.30"/>
+        <rect x="14" y="5" width="6" height="4" rx="1" fill="#0071E3" opacity="0.22"/>
+        <rect x="22" y="6" width="5" height="3" rx="1" fill="#0071E3" opacity="0.22"/>
+      </svg>
+      #1 Goal: <strong>Add $2–3 million in gross sales to the fleet this quarter</strong>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ TIME SUMMARY ═══════════════════════ -->
+  <div class="section section-summary" id="summary">
+   <div class="section-inner">
+    <div class="section-title">What I learned from my time audit</div>
+    <div class="section-headline grad-blue">The data tells a clear story.</div>
+    <div class="section-desc">Three signals that define where the time is — and where it needs to go.</div>
+
+    <div class="grid-3" style="margin-bottom:16px;">
+
+      <!-- Card 1: Email -->
+      <div class="insight-card insight-card-1">
+        <div class="insight-icon blue">
+          <!-- Inbox/email icon -->
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <rect x="2" y="4" width="16" height="12" rx="2.5" stroke="#0071E3" stroke-width="1.5"/>
+            <path d="M2 7l8 5 8-5" stroke="#0071E3" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="insight-stat">845</div>
+          <div class="insight-stat-label">Outlook visits in 3 weeks</div>
+        </div>
+        <div class="insight-body">
+          <strong>Email is the default work mode.</strong> That's 57% of all browser activity — ~56 opens per workday. Living reactively in the inbox, not proactively selling.
+        </div>
+      </div>
+
+      <!-- Card 2: LinkedIn -->
+      <div class="insight-card insight-card-2">
+        <div class="insight-icon purple">
+          <!-- LinkedIn-style icon -->
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <rect x="2" y="2" width="16" height="16" rx="3" stroke="#5E5CE6" stroke-width="1.5"/>
+            <circle cx="6.5" cy="7" r="1.2" fill="#5E5CE6"/>
+            <rect x="5.5" y="9.5" width="2" height="5.5" rx="1" fill="#5E5CE6"/>
+            <path d="M9.5 9.5h2v1s.5-1.5 2.5-1.5 2.5 1.5 2.5 3v3h-2v-2.5c0-.8-.4-1.5-1.25-1.5s-1.25.7-1.25 1.5V15h-2V9.5z" fill="#5E5CE6"/>
+          </svg>
+        </div>
+        <div>
+          <div class="insight-stat" style="color:var(--accent2);">534</div>
+          <div class="insight-stat-label">Post impressions per week</div>
+        </div>
+        <div class="insight-body">
+          <strong>LinkedIn is generating warm inbound — none of it is actioned.</strong> 29–33 profile views per week. These signals evaporate every Monday with no follow-up.
+        </div>
+      </div>
+
+      <!-- Card 3: Distraction -->
+      <div class="insight-card insight-card-3">
+        <div class="insight-icon orange">
+          <!-- Warning / signal icon -->
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 3L18 17H2L10 3z" stroke="#FF9F0A" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M10 9v3.5" stroke="#FF9F0A" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="10" cy="14.5" r="0.8" fill="#FF9F0A"/>
+          </svg>
+        </div>
+        <div>
+          <div class="insight-stat" style="color:var(--yellow);">~12%</div>
+          <div class="insight-stat-label">Browser time on personal sites</div>
+        </div>
+        <div class="insight-body">
+          <strong>Intelligence exists but no action follows.</strong> Daily Google Alerts arrive and disappear. Real estate, career exploration, and office pools compete directly with the $2–3M goal.
+        </div>
+      </div>
+    </div>
+
+    <a href="time-audit.html" class="audit-link">
+      Full Time Audit
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6h7M6.5 3l3 3-3 3" stroke="#0071E3" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+   </div><!-- /section-inner -->
+  </div><!-- /section-summary -->
+
+  <!-- ═══════════════════════ WHAT I'M BUILDING ═══════════════════════ -->
+  <div class="section section-building" id="building">
+   <div class="section-inner">
+    <div class="section-title">What I'm building</div>
+    <div class="section-headline grad-purple">Six automations. One goal.</div>
+    <div class="section-desc">Sorted by impact: hours reclaimed × direct alignment with the $2–3M target.</div>
+
+    <!-- Card 1 — Prospect list -->
+    <div class="auto-card auto-card-1">
+      <div class="auto-card-top">
+        <div class="auto-icon blue">
+          <!-- Truck / prospect icon -->
+          <svg width="26" height="22" viewBox="0 0 26 22" fill="none">
+            <rect x="0.5" y="4" width="16" height="6" rx="1.2" fill="#0071E3" opacity="0.20" stroke="#0071E3" stroke-width="1.1"/>
+            <rect x="0.5" y="8.5" width="16" height="1.5" rx="0.75" fill="#0071E3" opacity="0.45"/>
+            <rect x="16.5" y="2.5" width="8.5" height="7.5" rx="1.5" fill="#0071E3"/>
+            <rect x="17" y="3.5" width="5" height="4.5" rx="0.8" fill="white" opacity="0.55"/>
+            <rect x="16" y="9.5" width="1.5" height="1" rx="0.5" fill="#0071E3" opacity="0.4"/>
+            <circle cx="4.5" cy="15.5" r="3" fill="#333336" stroke="white" stroke-width="0.8"/>
+            <circle cx="4.5" cy="15.5" r="1.2" fill="#6E6E73"/>
+            <circle cx="11.5" cy="15.5" r="3" fill="#333336" stroke="white" stroke-width="0.8"/>
+            <circle cx="11.5" cy="15.5" r="1.2" fill="#6E6E73"/>
+            <circle cx="20.5" cy="15.5" r="3" fill="#333336" stroke="white" stroke-width="0.8"/>
+            <circle cx="20.5" cy="15.5" r="1.2" fill="#6E6E73"/>
+            <rect x="2" y="0.5" width="4" height="4" rx="0.8" fill="#0071E3" opacity="0.25"/>
+            <rect x="7.5" y="1" width="3" height="3.5" rx="0.8" fill="#0071E3" opacity="0.18"/>
+          </svg>
+        </div>
+        <div class="auto-header">
+          <div class="auto-rank">#1 Impact</div>
+          <div class="auto-outcome">A vetted list of 10 flatbed-ready prospects lands in my inbox every Monday morning — no hunting required.</div>
+        </div>
+      </div>
+      <div class="auto-divider"></div>
+      <div class="auto-cols">
+        <div>
+          <div class="auto-col-label"><span class="dot dot-red"></span>What's happening today</div>
+          <div class="auto-col-body">Lead research is manual and invisible. No prospect lists in email, no research sessions on calendar. The hunting isn't happening at the volume needed for a $2–3M quarter.</div>
+        </div>
+        <div>
+          <div class="auto-col-label"><span class="dot dot-green"></span>What the automated version looks like</div>
+          <div class="auto-col-body">Scheduled agent runs Sunday night: searches east coast manufacturers and distributors in steel, lumber, and building materials. Filters by freight type, geography, and volume signals. Delivers a formatted list — company, contact, why they fit, outreach angle — to email by 7am Monday.</div>
+        </div>
+      </div>
+      <div class="auto-footer">
+        <span class="badge badge-medium">Medium lift</span>
+        <span class="badge badge-hours">~3–4 hrs/week reclaimed</span>
+        <span class="badge badge-status">Not started</span>
+      </div>
+    </div>
+
+    <!-- Card 2 — LinkedIn -->
+    <div class="auto-card auto-card-2">
+      <div class="auto-card-top">
+        <div class="auto-icon purple">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+            <rect x="2" y="2" width="22" height="22" rx="5" stroke="#5E5CE6" stroke-width="1.5"/>
+            <circle cx="8.5" cy="9" r="2" fill="#5E5CE6"/>
+            <rect x="7" y="12.5" width="3" height="8" rx="1.5" fill="#5E5CE6"/>
+            <path d="M12.5 12.5h3v1.5s.8-2 3.5-2 3.5 2 3.5 4.5v4h-3v-3.5c0-1.1-.6-2-1.75-2S16 17.9 16 19v3.5h-3V12.5z" fill="#5E5CE6"/>
+          </svg>
+        </div>
+        <div class="auto-header">
+          <div class="auto-rank">#2 Impact</div>
+          <div class="auto-outcome">Every LinkedIn profile view on the JRC page gets turned into a researched contact with a draft outreach message — within 24 hours, automatically.</div>
+        </div>
+      </div>
+      <div class="auto-divider"></div>
+      <div class="auto-cols">
+        <div>
+          <div class="auto-col-label"><span class="dot dot-red"></span>What's happening today</div>
+          <div class="auto-col-body">LinkedIn sends weekly summaries showing 29–33 profile views and 500+ impressions. These warm inbound signals go unactioned — no follow-up visible in email or calendar.</div>
+        </div>
+        <div>
+          <div class="auto-col-label"><span class="dot dot-green"></span>What the automated version looks like</div>
+          <div class="auto-col-body">Triggered when a LinkedIn notification arrives: agent extracts viewer details, researches the company, drafts a personalized connection message. Drops into Gmail as a draft ready to approve. 30 seconds to review vs. 20+ minutes of manual research.</div>
+        </div>
+      </div>
+      <div class="auto-footer">
+        <span class="badge badge-quick">Quick win</span>
+        <span class="badge badge-hours">~2 hrs/week reclaimed</span>
+        <span class="badge badge-status">Not started</span>
+      </div>
+    </div>
+
+    <!-- Card 3 — Follow-up cadence -->
+    <div class="auto-card auto-card-3">
+      <div class="auto-card-top">
+        <div class="auto-icon green">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+            <circle cx="13" cy="13" r="10" stroke="#34C759" stroke-width="1.5"/>
+            <path d="M13 7v6l4 3" stroke="#34C759" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7 20l-2 2M19 20l2 2" stroke="#34C759" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="auto-header">
+          <div class="auto-rank">#3 Impact</div>
+          <div class="auto-outcome">Follow-up with every prospect I've contacted happens on schedule without me tracking it — nothing goes cold because I forgot.</div>
+        </div>
+      </div>
+      <div class="auto-divider"></div>
+      <div class="auto-cols">
+        <div>
+          <div class="auto-col-label"><span class="dot dot-red"></span>What's happening today</div>
+          <div class="auto-col-body">No follow-up tracking system visible. No structured outreach cadence on the calendar. Leads contacted once likely go silent.</div>
+        </div>
+        <div>
+          <div class="auto-col-label"><span class="dot dot-green"></span>What the automated version looks like</div>
+          <div class="auto-col-body">When an outreach email is sent via Gmail, a scheduled task fires: +3 days, +7 days, +14 days follow-up drafts are generated and queued. Each draft is personalized with a new angle. Approve or skip in one click.</div>
+        </div>
+      </div>
+      <div class="auto-footer">
+        <span class="badge badge-medium">Medium lift</span>
+        <span class="badge badge-hours">~2–3 hrs/week reclaimed</span>
+        <span class="badge badge-status">Not started</span>
+      </div>
+    </div>
+
+    <!-- Card 4 — Google Alert digest -->
+    <div class="auto-card auto-card-4">
+      <div class="auto-card-top">
+        <div class="auto-icon orange">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+            <!-- newspaper / intel icon -->
+            <rect x="3" y="4" width="20" height="18" rx="3" stroke="#FF9F0A" stroke-width="1.5"/>
+            <rect x="6.5" y="8" width="8" height="1.5" rx="0.75" fill="#FF9F0A"/>
+            <rect x="6.5" y="11" width="13" height="1.2" rx="0.6" fill="#FF9F0A" opacity="0.5"/>
+            <rect x="6.5" y="13.5" width="11" height="1.2" rx="0.6" fill="#FF9F0A" opacity="0.5"/>
+            <rect x="6.5" y="16" width="13" height="1.2" rx="0.6" fill="#FF9F0A" opacity="0.35"/>
+            <circle cx="19.5" cy="8.5" r="3.5" fill="#FF9F0A" opacity="0.15" stroke="#FF9F0A" stroke-width="1.2"/>
+            <path d="M18.5 8.5l.8.8 1.5-1.5" stroke="#FF9F0A" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="auto-header">
+          <div class="auto-rank">#4 Impact</div>
+          <div class="auto-outcome">My daily Google Alert on "Flatbed Owner Operator" gets turned into a 3-bullet industry brief with one specific action I can take — not just a list of articles.</div>
+        </div>
+      </div>
+      <div class="auto-divider"></div>
+      <div class="auto-cols">
+        <div>
+          <div class="auto-col-label"><span class="dot dot-red"></span>What's happening today</div>
+          <div class="auto-col-body">Google Alert arrives daily. Raw article links, no synthesis. Extracting actionable intel is a manual 15–30 min process that likely doesn't happen consistently.</div>
+        </div>
+        <div>
+          <div class="auto-col-label"><span class="dot dot-green"></span>What the automated version looks like</div>
+          <div class="auto-col-body">Triggered on alert receipt: agent reads article links, summarizes key industry signals, flags any company names matching ICP, and surfaces one "do this today" action. Delivered as a 5-line digest reply in Gmail.</div>
+        </div>
+      </div>
+      <div class="auto-footer">
+        <span class="badge badge-quick">Quick win</span>
+        <span class="badge badge-hours">~1 hr/week + intel quality boost</span>
+        <span class="badge badge-status">Not started</span>
+      </div>
+    </div>
+
+    <!-- Card 5 — Inbox triage -->
+    <div class="auto-card auto-card-5">
+      <div class="auto-card-top">
+        <div class="auto-icon blue">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+            <!-- filter / sort icon -->
+            <rect x="3" y="5" width="20" height="16" rx="3" stroke="#0071E3" stroke-width="1.5"/>
+            <path d="M3 10h20" stroke="#0071E3" stroke-width="1.2" opacity="0.4"/>
+            <circle cx="13" cy="16" r="3" fill="#0071E3" opacity="0.15" stroke="#0071E3" stroke-width="1.2"/>
+            <path d="M12 16l1 1 1.5-1.5" stroke="#0071E3" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="6" y="7" width="5" height="1.2" rx="0.6" fill="#0071E3" opacity="0.5"/>
+            <rect x="13" y="7" width="7" height="1.2" rx="0.6" fill="#0071E3" opacity="0.3"/>
+          </svg>
+        </div>
+        <div class="auto-header">
+          <div class="auto-rank">#5 Impact</div>
+          <div class="auto-outcome">My inbox shows only things that need me — everything else is auto-sorted before I open Gmail each morning.</div>
+        </div>
+      </div>
+      <div class="auto-divider"></div>
+      <div class="auto-cols">
+        <div>
+          <div class="auto-col-label"><span class="dot dot-red"></span>What's happening today</div>
+          <div class="auto-col-body">Gmail is dominated by Zillow alerts (10+/week), marketing emails from Under Armour, TaylorMade, Harbor Freight, and newsletters. Every open is a visual scan of 90% noise.</div>
+        </div>
+        <div>
+          <div class="auto-col-label"><span class="dot dot-green"></span>What the automated version looks like</div>
+          <div class="auto-col-body">Scheduled morning triage: agent scans inbox, labels and archives noise, flags anything from JRC domains or known contacts, and sends a "your inbox in 60 seconds" summary to the top of the inbox.</div>
+        </div>
+      </div>
+      <div class="auto-footer">
+        <span class="badge badge-quick">Quick win</span>
+        <span class="badge badge-hours">~30 min/day reclaimed</span>
+        <span class="badge badge-status">Not started</span>
+      </div>
+    </div>
+
+    <!-- Card 6 — Account check-ins -->
+    <div class="auto-card auto-card-6">
+      <div class="auto-card-top">
+        <div class="auto-icon green">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+            <!-- relationship / handshake-like icon: building + truck -->
+            <rect x="3" y="8" width="10" height="14" rx="2" stroke="#34C759" stroke-width="1.5"/>
+            <rect x="5" y="11" width="2.5" height="2.5" rx="0.5" fill="#34C759" opacity="0.5"/>
+            <rect x="8.5" y="11" width="2.5" height="2.5" rx="0.5" fill="#34C759" opacity="0.5"/>
+            <rect x="5" y="15" width="2.5" height="2.5" rx="0.5" fill="#34C759" opacity="0.5"/>
+            <rect x="8.5" y="15" width="2.5" height="2.5" rx="0.5" fill="#34C759" opacity="0.5"/>
+            <!-- mini truck heading toward building -->
+            <rect x="14" y="13" width="8.5" height="5" rx="1.2" fill="#34C759" opacity="0.18" stroke="#34C759" stroke-width="1"/>
+            <rect x="14" y="14.5" width="8.5" height="1.2" rx="0.6" fill="#34C759" opacity="0.35"/>
+            <path d="M22.5 13.5v-2.5a1 1 0 00-1-1H19l-1 3.5h4.5z" fill="#34C759" opacity="0.7"/>
+            <circle cx="16.5" cy="19.5" r="1.8" fill="#1D1D1F" stroke="white" stroke-width="0.6"/>
+            <circle cx="21" cy="19.5" r="1.8" fill="#1D1D1F" stroke="white" stroke-width="0.6"/>
+          </svg>
+        </div>
+        <div class="auto-header">
+          <div class="auto-rank">#6 Impact</div>
+          <div class="auto-outcome">Existing accounts like Home Depot get a proactive rate or lane check-in from me every 30 days — without me remembering to do it.</div>
+        </div>
+      </div>
+      <div class="auto-divider"></div>
+      <div class="auto-cols">
+        <div>
+          <div class="auto-col-label"><span class="dot dot-red"></span>What's happening today</div>
+          <div class="auto-col-body">Account expansion is ops-driven, not sales-driven. The HD rate thread shows Blaise was CC'd, not originating. Relationship-building is happening through operations.</div>
+        </div>
+        <div>
+          <div class="auto-col-label"><span class="dot dot-green"></span>What the automated version looks like</div>
+          <div class="auto-col-body">Monthly scheduled task: for each named account, agent drafts a brief relationship email — lane volume update, market rate color, new capacity availability. Queued as a draft to personalize and send. Keeps JRC top of mind between freight cycles.</div>
+        </div>
+      </div>
+      <div class="auto-footer">
+        <span class="badge badge-quick">Quick win</span>
+        <span class="badge badge-hours">~1–2 hrs/month + relationship compounding</span>
+        <span class="badge badge-status">Not started</span>
+      </div>
+    </div>
+
+   </div><!-- /section-inner -->
+  </div><!-- /section-building -->
+
+  <!-- ═══════════════════════ MY SYSTEM ═══════════════════════ -->
+  <div class="section section-system" id="system">
+   <div class="section-inner">
+    <div class="section-title">My system — sprint roadmap</div>
+    <div class="section-headline grad-green">Six sprints. One portfolio.</div>
+    <div class="section-desc">Each sprint builds on the last — from audit to a fully agentic sales system.</div>
+
+    <div class="sprint-grid">
+
+      <!-- S1 — done -->
+      <div class="sprint-card done">
+        <div class="sprint-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <circle cx="11" cy="11" r="9" stroke="#34C759" stroke-width="1.5"/>
+            <path d="M7 11.5l3 3 5-5.5" stroke="#34C759" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="sprint-sprint-num">Sprint 1</div>
+        <div class="sprint-title-text">Time Audit + Automation Mapping</div>
+        <div class="sprint-status-text">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" fill="#34C759" opacity="0.2"/><path d="M3.5 6.5l2 2 3-3.5" stroke="#34C759" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Sprint 1 complete
+        </div>
+      </div>
+
+      <!-- S2 — pending -->
+      <div class="sprint-card pending">
+        <div class="sprint-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="3" y="5" width="16" height="12" rx="2.5" stroke="#8E8E93" stroke-width="1.4"/>
+            <path d="M7 9h8M7 13h5" stroke="#8E8E93" stroke-width="1.3" stroke-linecap="round" opacity="0.6"/>
+          </svg>
+        </div>
+        <div class="sprint-sprint-num">Sprint 2</div>
+        <div class="sprint-title-text">Deployed website + data collection tool</div>
+        <div class="sprint-status-text">Coming in Sprint 2</div>
+      </div>
+
+      <!-- S3 — pending -->
+      <div class="sprint-card pending">
+        <div class="sprint-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M4 11a7 7 0 1114 0" stroke="#8E8E93" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M4 11l-1.5 1.5M4 11l1.5 1.5" stroke="#8E8E93" stroke-width="1.3" stroke-linecap="round"/>
+            <rect x="8" y="13" width="6" height="5" rx="1.5" stroke="#8E8E93" stroke-width="1.3" opacity="0.6"/>
+          </svg>
+        </div>
+        <div class="sprint-sprint-num">Sprint 3</div>
+        <div class="sprint-title-text">Automated n8n or Claude Routines workflow</div>
+        <div class="sprint-status-text">Coming in Sprint 3</div>
+      </div>
+
+      <!-- S4 — pending -->
+      <div class="sprint-card pending">
+        <div class="sprint-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="#8E8E93" stroke-width="1.4"/>
+            <rect x="12" y="3" width="7" height="7" rx="1.5" stroke="#8E8E93" stroke-width="1.4" opacity="0.5"/>
+            <rect x="3" y="12" width="7" height="7" rx="1.5" stroke="#8E8E93" stroke-width="1.4" opacity="0.5"/>
+            <rect x="12" y="12" width="7" height="7" rx="1.5" stroke="#8E8E93" stroke-width="1.4" opacity="0.3"/>
+          </svg>
+        </div>
+        <div class="sprint-sprint-num">Sprint 4</div>
+        <div class="sprint-title-text">Knowledge wiki context system</div>
+        <div class="sprint-status-text">Coming in Sprint 4</div>
+      </div>
+
+      <!-- S5 — pending -->
+      <div class="sprint-card pending">
+        <div class="sprint-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <circle cx="11" cy="8" r="3" stroke="#8E8E93" stroke-width="1.4"/>
+            <path d="M6 18c0-3 2-5 5-5s5 2 5 5" stroke="#8E8E93" stroke-width="1.4" stroke-linecap="round" opacity="0.6"/>
+            <path d="M16 6l1.5-1.5M16 10l1.5 1.5M18 8h-2" stroke="#8E8E93" stroke-width="1.3" stroke-linecap="round" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="sprint-sprint-num">Sprint 5</div>
+        <div class="sprint-title-text">Custom agentic workflow</div>
+        <div class="sprint-status-text">Coming in Sprint 5</div>
+      </div>
+
+      <!-- S6 — pending -->
+      <div class="sprint-card pending">
+        <div class="sprint-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M11 3v2M11 17v2M3 11h2M17 11h2M5.6 5.6l1.4 1.4M15 15l1.4 1.4M5.6 16.4l1.4-1.4M15 7l1.4-1.4" stroke="#8E8E93" stroke-width="1.3" stroke-linecap="round" opacity="0.5"/>
+            <circle cx="11" cy="11" r="3.5" stroke="#8E8E93" stroke-width="1.4"/>
+          </svg>
+        </div>
+        <div class="sprint-sprint-num">Sprint 6</div>
+        <div class="sprint-title-text">Eval system — tested and documented</div>
+        <div class="sprint-status-text">Coming in Sprint 6</div>
+      </div>
+
+    </div>
+   </div><!-- /section-inner -->
+  </div><!-- /section-system -->
+
+  <!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+  <div class="footer">
+    AI Builder Automation Portfolio &nbsp;—&nbsp; April 21, 2026 &nbsp;|&nbsp; Built in L2
+  </div>
+
+</div>
+</body>
+</html>
