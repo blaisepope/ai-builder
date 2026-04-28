@@ -160,9 +160,109 @@
   .section { margin-bottom: 0; }
   .section-inner { max-width: 1100px; margin: 0 auto; padding: 56px 24px; }
 
-  .section-summary { background: var(--grad-summary-bg); }
+  .section-summary  { background: var(--grad-summary-bg); }
   .section-building { background: var(--grad-building-bg); }
-  .section-system  { background: var(--grad-system-bg); }
+  .section-system   { background: var(--grad-system-bg); }
+  .section-sprint2  { background: linear-gradient(160deg, #EEF4FF 0%, #F0EEFF 50%, #F5F0FF 100%); }
+
+  /* ── Sprint 2 delivery cards ── */
+  .delivery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 780px) { .delivery-grid { grid-template-columns: 1fr; } }
+
+  .delivery-card {
+    background: #FFFFFF;
+    border-radius: 18px;
+    padding: 26px 22px 22px;
+    border: 1px solid var(--border-light);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .delivery-card:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.08); }
+  .delivery-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 18px 18px 0 0;
+  }
+  .delivery-card-1::before { background: var(--grad-blue-purple); }
+  .delivery-card-2::before { background: var(--grad-green-teal); }
+  .delivery-card-3::before { background: var(--grad-purple-pink); }
+
+  .delivery-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #1E8A3C;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .delivery-label .dot-shipped { width: 6px; height: 6px; border-radius: 50%; background: #34C759; flex-shrink: 0; }
+
+  .delivery-title {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.374px;
+    line-height: 1.35;
+    color: var(--text);
+  }
+  .delivery-body {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.65;
+    flex: 1;
+  }
+  .delivery-body strong { color: var(--text2); font-weight: 600; }
+
+  .delivery-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding-top: 14px;
+    border-top: 1px solid var(--border-light);
+  }
+
+  /* ── Live URL row ── */
+  .url-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  @media (max-width: 780px) { .url-row { grid-template-columns: 1fr; } }
+
+  .url-card {
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0,113,227,0.14);
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .url-card:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,113,227,0.10); text-decoration: none; }
+  .url-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0;
+    box-shadow: 0 0 0 3px rgba(52,199,89,0.18);
+  }
+  .url-info { flex: 1; min-width: 0; }
+  .url-name { font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: -0.12px; margin-bottom: 2px; }
+  .url-path { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .url-arrow { color: var(--accent); flex-shrink: 0; }
 
   .section-title {
     font-size: 11px;
@@ -489,6 +589,8 @@
   <a href="#summary">Time Summary</a>
   <a href="#building">What I'm Building</a>
   <a href="#system">My System</a>
+  <a href="#sprint2">Sprint 2</a>
+  <a href="ai-builder-dashboard.html">Dashboard</a>
   <a href="time-audit.html">Time Audit</a>
 </nav>
 
@@ -875,17 +977,20 @@
         </div>
       </div>
 
-      <!-- S2 — pending -->
-      <div class="sprint-card pending">
+      <!-- S2 — done -->
+      <div class="sprint-card done">
         <div class="sprint-icon">
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-            <rect x="3" y="5" width="16" height="12" rx="2.5" stroke="#8E8E93" stroke-width="1.4"/>
-            <path d="M7 9h8M7 13h5" stroke="#8E8E93" stroke-width="1.3" stroke-linecap="round" opacity="0.6"/>
+            <circle cx="11" cy="11" r="9" stroke="#34C759" stroke-width="1.5"/>
+            <path d="M7 11.5l3 3 5-5.5" stroke="#34C759" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
         <div class="sprint-sprint-num">Sprint 2</div>
-        <div class="sprint-title-text">Deployed website + data collection tool</div>
-        <div class="sprint-status-text">Coming in Sprint 2</div>
+        <div class="sprint-title-text">Live dashboard + Notion backend + advisor agent</div>
+        <div class="sprint-status-text">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" fill="#34C759" opacity="0.2"/><path d="M3.5 6.5l2 2 3-3.5" stroke="#34C759" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Sprint 2 complete
+        </div>
       </div>
 
       <!-- S3 — pending -->
@@ -948,9 +1053,122 @@
    </div><!-- /section-inner -->
   </div><!-- /section-system -->
 
+  <!-- ═══════════════════════ SPRINT 2 ═══════════════════════ -->
+  <div class="section section-sprint2" id="sprint2">
+   <div class="section-inner">
+    <div class="section-title">Sprint 2 &nbsp;·&nbsp; April 28, 2026</div>
+    <div class="section-headline grad-purple">The stack is live.</div>
+    <div class="section-desc">Three systems shipped in one session: a Notion-backed dashboard, a live API, and an advisor agent that reads the roadmap on demand.</div>
+
+    <div class="delivery-grid">
+
+      <!-- Card 1: Kanban Dashboard -->
+      <div class="delivery-card delivery-card-1">
+        <div class="auto-icon blue" style="width:44px;height:44px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="3" width="5.5" height="14" rx="1.5" fill="#0071E3" opacity="0.20" stroke="#0071E3" stroke-width="1.2"/>
+            <rect x="9.25" y="3" width="5.5" height="9" rx="1.5" fill="#0071E3" opacity="0.20" stroke="#0071E3" stroke-width="1.2"/>
+            <rect x="16.5" y="3" width="5.5" height="6" rx="1.5" fill="#0071E3" opacity="0.20" stroke="#0071E3" stroke-width="1.2"/>
+            <rect x="2" y="19" width="20" height="1.5" rx="0.75" fill="#0071E3" opacity="0.25"/>
+          </svg>
+        </div>
+        <div class="delivery-label"><span class="dot-shipped"></span>Shipped</div>
+        <div class="delivery-title">Kanban Dashboard</div>
+        <div class="delivery-body">
+          <strong>6 automation ideas</strong> loaded live from Notion — each as a draggable card across Suggested, To Build, In Progress, and Done columns. Click any card to open its full scope doc. Column changes write back to Notion in real time via a serverless API.
+        </div>
+        <div class="delivery-footer">
+          <span class="badge badge-quick">6 cards</span>
+          <span class="badge badge-hours">Drag-to-update</span>
+          <span class="badge" style="background:var(--accent-soft);color:#005BBB;border:1px solid rgba(0,113,227,0.20);">Live API</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Notion Backend -->
+      <div class="delivery-card delivery-card-2">
+        <div class="auto-icon green" style="width:44px;height:44px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="4" width="18" height="4" rx="1.5" stroke="#34C759" stroke-width="1.3"/>
+            <rect x="3" y="10" width="18" height="4" rx="1.5" stroke="#34C759" stroke-width="1.3" opacity="0.7"/>
+            <rect x="3" y="16" width="18" height="4" rx="1.5" stroke="#34C759" stroke-width="1.3" opacity="0.45"/>
+            <circle cx="7" cy="6" r="1" fill="#34C759"/>
+            <circle cx="7" cy="12" r="1" fill="#34C759" opacity="0.7"/>
+            <circle cx="7" cy="18" r="1" fill="#34C759" opacity="0.45"/>
+          </svg>
+        </div>
+        <div class="delivery-label"><span class="dot-shipped"></span>Shipped</div>
+        <div class="delivery-title">Notion Backend</div>
+        <div class="delivery-body">
+          <strong>AI Automation Roadmap</strong> database created with Name, Status, Priority, Description, and Project Spec columns. Wired to the dashboard via <code style="font-family:monospace;font-size:12px;color:var(--text2);">/api/roadmap</code> — GET loads all cards, PATCH updates status on drag. Single source of truth.
+        </div>
+        <div class="delivery-footer">
+          <span class="badge badge-quick">GET + PATCH</span>
+          <span class="badge badge-hours">Real-time sync</span>
+          <span class="badge" style="background:var(--green-soft);color:#1E8A3C;border:1px solid rgba(52,199,89,0.25);">Notion API</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Automation Advisor -->
+      <div class="delivery-card delivery-card-3">
+        <div class="auto-icon purple" style="width:44px;height:44px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="9" r="5" stroke="#5E5CE6" stroke-width="1.3"/>
+            <path d="M9 9h6M12 6v6" stroke="#5E5CE6" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
+            <path d="M5 20c0-3 3-5 7-5s7 2 7 5" stroke="#5E5CE6" stroke-width="1.3" stroke-linecap="round" opacity="0.7"/>
+            <path d="M19 5l1.5-1.5M19 9h2M17 3l1-2" stroke="#5E5CE6" stroke-width="1.2" stroke-linecap="round" opacity="0.45"/>
+          </svg>
+        </div>
+        <div class="delivery-label"><span class="dot-shipped"></span>Shipped</div>
+        <div class="delivery-title">Automation Advisor Agent</div>
+        <div class="delivery-body">
+          Three-mode skill: reads the live Notion roadmap, analyzes recent Claude Code session history, and outputs a <strong>60-second briefing</strong> — current priorities, anything stalled, and one automation to add next. Also includes a Build Planner mode for scoping new ideas through a structured interview.
+        </div>
+        <div class="delivery-footer">
+          <span class="badge badge-quick">3 modes</span>
+          <span class="badge badge-hours">60-sec briefing</span>
+          <span class="badge" style="background:var(--accent2-soft);color:#3E3ABF;border:1px solid rgba(94,92,230,0.22);">/automation-advisor</span>
+        </div>
+      </div>
+
+    </div><!-- /delivery-grid -->
+
+    <!-- Live URL row -->
+    <div style="margin-bottom:10px;">
+      <div class="section-title" style="margin-bottom:14px;">Live on Vercel</div>
+    </div>
+    <div class="url-row">
+      <a class="url-card" href="https://ai-builder-pied.vercel.app/time-audit.html" target="_blank">
+        <span class="url-dot"></span>
+        <span class="url-info">
+          <div class="url-name">Time Audit</div>
+          <div class="url-path">ai-builder-pied.vercel.app/time-audit.html</div>
+        </span>
+        <svg class="url-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8.5 4l3 3-3 3" stroke="#0071E3" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a class="url-card" href="https://ai-builder-pied.vercel.app/ai-builder-plan.html" target="_blank">
+        <span class="url-dot"></span>
+        <span class="url-info">
+          <div class="url-name">Automation Plan</div>
+          <div class="url-path">ai-builder-pied.vercel.app/ai-builder-plan.html</div>
+        </span>
+        <svg class="url-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8.5 4l3 3-3 3" stroke="#0071E3" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a class="url-card" href="https://ai-builder-pied.vercel.app/ai-builder-dashboard.html" target="_blank">
+        <span class="url-dot"></span>
+        <span class="url-info">
+          <div class="url-name">Kanban Dashboard</div>
+          <div class="url-path">ai-builder-pied.vercel.app/ai-builder-dashboard.html</div>
+        </span>
+        <svg class="url-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8.5 4l3 3-3 3" stroke="#0071E3" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+   </div><!-- /section-inner -->
+  </div><!-- /section-sprint2 -->
+
   <!-- ═══════════════════════ FOOTER ═══════════════════════ -->
   <div class="footer">
-    AI Builder Automation Portfolio &nbsp;—&nbsp; April 21, 2026 &nbsp;|&nbsp; Built in L2
+    AI Builder Automation Portfolio &nbsp;—&nbsp; Sprint 2 complete: April 28, 2026 &nbsp;|&nbsp; Built in L2
   </div>
 
 </div>
